@@ -1,0 +1,112 @@
+################################################################################
+## Globaly ignored files
+*.autosave
+*.backup
+*.layout
+*.~lock*
+*.user*
+*.save
+*.user
+*.bak
+*.cbp
+*.lib
+*.moc
+*.ncb
+*.obj
+*.suo
+*.swp
+*.so
+*.a
+*.o
+*~
+
+################################################################################
+## CMake
+CMakeFiles/
+BUILD/
+
+CMakeLists.txt.user
+cmake_install.cmake
+CMakeCache.txt
+
+################################################################################
+## QMake (Deprecated build-system)
+*.pri
+*.pro
+moc_*
+
+################################################################################
+## Ignored project files and directories
+include/
+.kdev4/
+lib/
+
+object_script.GMlib.Release
+object_script.GMlib.Debug
+Makefile.Release
+Makefile.Debug
+Makefile
+*.kdev4
+
+################################################################################
+## Ignored Qt Creator specific directories
+qtc-gdbmacros
+
+################################################################################
+## Ignored LaTeX output files
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.gz
+
+################################################################################
+## Ignored KDE Dolphin files
+.directory
+
+################################################################################
+## Ignored PyCharm files
+__pycache__/
+.idea/
+
+################################################################################
+## Ignored Sphinx documentation files
+doctrees/
+*.doctree
+
+################################################################################
+## Ignored venv files
+venv/
+
+################################################################################
+## Ignored IntelliJ & Java files
+.mtj.tmp/
+.idea/
+out/
+
+*.tar.gz
+*.class
+*.ctxt
+*.ear
+*.iml
+*.jar
+*.rar
+*.war
+*.zip
+
+################################################################################
+## Ignored Eclipse files
+.settings/
+bin/
+
+*.classpath
+*.project
+
+################################################################################
+## Ignored Electron files
+node_modules/
+out/
+
+*.node-version
+npm-debug.log

@@ -1,0 +1,47 @@
+################################################################################
+##
+## Copyright (C) 2012 GMlib Team / Narvik University College
+## Contact: GMlib Online Portal at http://episteme.hin.no
+##
+## This file is part of EnhancedCMake, ECMake.
+##
+## ECMake is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Lesser General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## ECMake is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+## GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with ECMake. If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
+
+
+# Helper vars
+set( PREFIX @CMAKE_BINARY_DIR@ )
+
+
+
+# Version
+set(@PROJECT_NAME@_VERSION @PROJECT_VERSION@)
+
+# Vars
+set(@PROJECT_NAME@_INCLUDE_DIRS "${PREFIX}/include")
+set(@PROJECT_NAME@_LINK_DIRS "${PREFIX}/lib" )
+set(@PROJECT_NAME@_LIBRARIES @VAR_MODULE_TARGETS@ )
+
+# Custom config [BEGIN]
+@VAR_CUSTOM_CONFIG@
+# Custom config [END]
+
+# Definitions [BEGIN]
+@VAR_DEFINITIONS@
+# Definitions [END]
+
+unset( PREFIX )
+
+

@@ -1,0 +1,589 @@
+/**********************************************************************************
+**
+** Copyright (C) 1994 Narvik University College
+** Contact: GMlib Online Portal at http://episteme.hin.no
+**
+** This file is part of the Geometric Modeling Library, GMlib.
+**
+** GMlib is free software: you can redistribute it and/or modify
+** it under the terms of the GNU Lesser General Public License as published by
+** the Free Software Foundation, either version 3 of the License, or
+** (at your option) any later version.
+**
+** GMlib is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU Lesser General Public License for more details.
+**
+** You should have received a copy of the GNU Lesser General Public License
+** along with GMlib.  If not, see <http://www.gnu.org/licenses/>.
+**
+**********************************************************************************/
+
+
+#include "../evaluators/gmevaluatorstatic.h"
+
+
+// gmlib
+#include <core/containers/gmdmatrix.h>
+#include <scene/selector/gmselector.h>
+
+namespace GMlib {
+
+
+
+//*****************************************
+// Constructors and destructor           **
+//*****************************************
+
+  template <typename T>
+  inline
+  PBSplineCurve<T>::PBSplineCurve(const DVector< Vector<T, 3> >& c, const DVector<T>& t, int d) {
+
+    _c = c;
+    _d = d;
+    _t = t;
+
+    init();
+  }
+
+
+  template <typename T>
+  inline
+  PBSplineCurve<T>::PBSplineCurve(const DVector< Vector<T, 3> >& c, int d) {
+
+    _c = c;
+    _d = d;
+    generateKnotVector();
+
+    init();
+  }
+
+
+  template <typename T>
+  inline
+  PBSplineCurve<T>::PBSplineCurve(const PBSplineCurve<T>& copy ) : PCurve<T,3>(copy) {
+
+      _c = copy._c;
+      _d = copy._d;
+      _t = copy._t;
+
+      init();
+  }
+
+
+  template <typename T>
+  PBSplineCurve<T>::~PBSplineCurve() {}
+
+
+
+  //*********************************
+  //**   Public local functons     **
+  //*********************************
+
+
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::setKnotVector( const DVector< T >& t ) {
+
+    if( t.getDim() != _c.getDim() + getDegree() + 1 )
+      return;
+
+    for( int i = 1; i < t.getDim(); i++ )
+      if( t(i) < t(i-1) )
+        return;
+
+    _t = t;
+  }
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::setResampleMode( GM_RESAMPLE_MODE mode ) {
+
+    _resamp_mode = mode;
+  }
+
+
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::generateKnotVector() {
+
+    int order = getDegree() + 1;
+
+    _t.setDim( _c.getDim() + order );
+    int step_knots = _t.getDim() - ( order * 2 );
+
+    T knot_value = T(0);
+    int i = 0;
+
+    // Set the start knots
+    for( ; i < order; i++ )
+      _t[i] = knot_value;
+
+    // Set the "step"-knots
+    for( int j = 0; j < step_knots; j++ )
+      _t[i++] = ++knot_value;
+
+    // Set the end knots
+    knot_value++;
+    for( ; i < _t.getDim(); i++ )
+      _t[i] = knot_value;
+  }
+
+
+  template <typename T>
+  inline
+  int PBSplineCurve<T>::getDegree() const {
+    return _d;
+  }
+
+
+
+  template <typename T>
+  void PBSplineCurve<T>::setClosed( bool closed, T dt) {
+
+      bool changed = false;
+      int k = _d+1;
+
+      if(_cl != closed) {
+          DVector<T> nt = _t;
+          if(closed) {
+              if(dt==T(0)) dt = (_t[_t.getDim()-k]-_t[_d])/(_t.getDim() - 2*k + 1);
+              initKnot( _t, _cl, k, nt, _c.getDim(), _d, dt);
+          } else
+              initKnot2(_t, _cl, nt, _c.getDim(), _d);
+          changed = true;
+      }
+
+      if(changed && _selectors) {
+          hideSelectors();
+          showSelectors(_selector_radius, _grid, _selector_color, _grid_color);
+      }
+  }
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::setControlPoints( const DVector< Vector<T,3> >& c, bool gen_t ) {
+
+
+    // Check whether the curve should be pre_evaluated again at the next evaluation,
+    // and if the control points should be updated
+    if( _c.getDim() == c.getDim() ) {
+
+      bool no_change = true;
+      for( int i = 0; i < c.getDim(); i++ )
+        if( _c[i] != c(i) )
+          no_change = false;
+
+      if( no_change )
+        return;
+    }
+    else
+      _pre_eval = true;
+
+
+    // Set Degree
+    _c = c;
+
+    // Adjust degree if to high.
+    if( _d > _c.getDim() - 1 )
+      _d = _c.getDim() - 1;
+
+    // Generate knot vector if it's desired
+    if( gen_t )
+      generateKnotVector();
+  }
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::setDegree( int d ) {
+
+    if( d >= _c.getDim() || d == _d)
+      return;
+
+    _d = d;
+    _pre_eval = true;
+  }
+
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::setScale( T scale ) {
+
+    if( scale != _scale ) {
+    _scale = scale;
+    _pre_eval = true;
+    }
+  }
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::setPartitionCritere(int pct) {
+      _pct = pct;
+  }
+
+
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::updateCoeffs( const Vector<T,3>& d ) {
+
+      if( _c_moved ) {
+          HqMatrix<T,3> invmat = this->_matrix;
+          invmat.invertOrthoNormal();
+
+          Vector<T,3> diff = invmat*d;
+          for( int i = 0; i < _c.getDim(); i++ ) {
+              _c[i] += diff;
+              _s[i]->translateParent( diff );
+          }
+          this->translateParent( -d );
+      }
+  }
+
+
+  //********************************************************
+  // Overrided (public) virtual functons from SceneObject **
+  //********************************************************
+
+  template <typename T>
+  void PBSplineCurve<T>::edit( int /*selector_id*/ ) {
+
+    _c_moved = true;
+
+    if( this->_parent )
+      this->_parent->edit( this );
+
+    if(_sgv)
+        _sgv->update();
+
+    _c_moved = false;
+  }
+
+
+
+  //**************************************************
+  // Overrided (public) virtual functons from PSurf **
+  //**************************************************
+
+
+
+
+  template <typename T>
+  void PBSplineCurve<T>::replot( int m, int d ) {
+
+      if(_part_viz) {
+          // Make new pre-samples if necessary
+          if( m != this->_no_sam && m > 1) {
+              this->_no_sam = m;
+              //           preSample(m);
+          }
+
+
+          // Correct derivatives
+          if( d < 1 )   d = this->_no_der;
+          else          this->_no_der = d;
+
+
+
+          // pre-sampel / pre evaluate data for a given parametric curve, if wanted/needed
+          //    preSample( m, d, getStartP(), getEndP() );
+
+          // Resample
+          DVector< DVector< Vector<T,3> > > p;
+          resample( p, m, d, getStartP(), getEndP() );
+
+          // Set The Surrounding Sphere
+          this->setSurroundingSphere(p);
+
+
+          // Replot Visaulizers
+          for( int i = 0; i < this->_pcurve_visualizers.getSize(); i++ )
+              this->_pcurve_visualizers[i]->replot( p, m, d, isClosed() );
+      } else
+          PCurve<T,3>::replot( m, d );
+  }
+
+
+
+  template <typename T>
+  bool PBSplineCurve<T>::isClosed() const {
+    return false;
+  }
+
+
+  template <typename T>
+  void PBSplineCurve<T>::showSelectors( T rad, bool grid, const Color& selector_color, const Color& grid_color ) {
+
+      if( _selectors ) return;
+
+      _s.setDim( _c.getDim() );
+
+      for( int i = 0, s_id = 0; i < _c.getDim(); i++ ) {
+              Selector<T,3> *sel = new Selector<T,3>( _c[i], s_id++, this, rad, selector_color );
+              this->insert( sel );
+              _s[i] = sel;
+          }
+
+      if( grid ) {
+          if(!_sgv) _sgv = new SelectorGridVisualizer<T>;
+          _sgv->setSelectors( _c, 0, _cl);
+          _sgv->setColor( grid_color );
+          this->insertVisualizer( _sgv );
+      }
+
+      _selector_radius = rad;
+      _selector_color  = selector_color;
+      _grid_color      = grid_color;
+      _grid            = grid;
+      _selectors       = true;
+  }
+
+
+  template <typename T>
+  void PBSplineCurve<T>::hideSelectors() {
+
+      if( !_selectors ) return;
+
+      // Remove Selector Grid Visualizer
+      if(_sgv){
+        this->removeVisualizer( _sgv );
+        _sgv->reset();
+      }
+
+      // Remove Selectors
+      for( int i = 0; i < _s.getDim(); i++ ) {
+          this->remove(_s[i]);
+          delete _s[i];
+      }
+      _selectors = false;
+  }
+
+
+
+
+
+  //*****************************************************
+  // Overrided (protected) virtual functons from PSurf **
+  //*****************************************************
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::eval( T t, int d, bool l ) const {
+
+      DMatrix<T> bhp;
+
+      // Evaluate the Bernstine Polynomial of sampl i of m
+      int idx = EvaluatorStatic<float>::evaluateBSp( bhp, t, _t, _d);
+
+      std::cout << "HEI!!!!" << bhp << std::endl;
+
+      // Compute the BSpline using the pre evalued Bernstein Polynomials and the Control Points.
+      DVector< Vector<T,3> > c;
+      c.setDim( _d + 1 );
+      for( int j = 0; j <= _d; j++ )
+        c[j] = _c[idx-(_d-j)];
+
+
+      this->_p = bhp * c;
+  }
+
+
+
+  template <typename T>
+  T PBSplineCurve<T>::getStartP() const {
+    return _t(getDegree());
+  }
+
+
+
+  template <typename T>
+  T PBSplineCurve<T>::getEndP() const {
+    return _t(_c.getDim());
+  }
+
+
+
+  //  template <typename T>
+  //  inline
+  //  int PBSplineCurve<T>::getIndex( T t, int m ) const {
+
+  //    return ( t * T(getDegree()) ) / T(m);
+  //  }
+
+
+
+
+  //*****************************************
+  //     Local (protected) functons        **
+  //*****************************************
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::init() {
+
+      this->_type_id = GM_SO_TYPE_CURVE_BSPLINE;
+
+      _selectors    = false;
+      _c_moved      = false;
+      _sgv          =  0x0;
+
+      _part_viz       = false;
+      _partitioned    = false;
+      _pct = 1;
+
+      _rt.setDim(1);
+  }
+
+
+  //***************************************************
+  // Overrided (private) virtual functons from PCurve **
+  //***************************************************
+
+
+
+  template <typename T>
+  void PBSplineCurve<T>::resample( DVector< DVector< Vector<T,3> > >& p, int m, int not_used, T start, T end ) {
+
+    // dt; sample step value
+    const T dt = (end-start) / T(m-1);
+
+    // Set dim of result set
+    p.setDim(m);
+
+    switch( _resamp_mode ) {
+
+      case GM_RESAMPLE_INLINE:
+        resampleInline( p, m, dt );
+        break;
+
+      case GM_RESAMPLE_PREEVAL:
+      default:
+        resamplePreEval( p, m, dt );
+        break;
+    }
+  }
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::resampleInline( DVector< DVector< Vector<T,3> > >& p, int m, T dt ) {
+
+    // For each sample point on the uniform curve compute the Bernstein-Hermite Polynomials
+    for( int i = 0; i < m; i++ ) {
+
+      eval( _t[0] + T(i) * dt );
+      p[i] = this->_p;
+    }
+  }
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::resamplePreEval( DVector< DVector< Vector<T,3> > >& p, int m, T dt ) {
+
+    const int d = getDegree();
+
+    if( _pre_eval ) {
+
+      T t;
+      int idx;
+
+      // Init the indice table and the Bernstein-Hermite Polynomial DVector used in pre-evaluation
+      _bhps.setDim(m);
+      _indices.setDim( m );
+
+      // Fill the Bernstein Polynomial Matrices
+      idx = d;
+      for( int i = 0; i < m; i++ ) {
+
+        // Calculate indices
+        t = _t[0] + T(i) * dt;
+        if( t > _t[idx+1] )
+          idx++;
+        _indices[i] = idx;
+
+        // Evaluate the Bernstine Polynomial of sampl i of m
+        EvaluatorStatic<float>::evaluateBSp2( _bhps[i], t, _t, _d, idx);
+
+//        evalBernsteinHermite( _bhps[i], t, idx );
+      }
+    }
+
+
+    // Compute the BSpline using the pre evalued Bernstein Polynomials and the Control Points.
+    DVector< Vector<T, 3> > c(d+1);
+    for( int i = 0; i < m; i++ ) {
+
+      for( int j = 0; j <= d; j++ )
+        c[j] = _c[_indices[i]-(d-j)];
+
+      p[i] = _bhps[i] * c;
+    }
+  }
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::multEval(DMatrix<Vector<T,3>>& p, const DMatrix<T>& bsh, const DVector<int>& ii, int d) {
+
+      // Set Dimensions
+      p.setDim(d+1);
+
+      //    p = bsh * c;
+      // We manually do this operation
+      // because we only want to compute the d first lines of bsh.
+      for(int i=0; i<=d; i++) {
+          p[i] = bsh(i)(0)*_c[ii(0)];
+          for(int k=1; k<=_d; k++)
+             p[i] += bsh(i)(k)*_c[ii(k)];
+      }
+  }
+
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::initKnot( DVector<T>& t, bool& c, int& k, const DVector<T>& g, int n, int d, T dt) {
+
+      k = d+1;
+      t.setDim(n+d+k);
+      if(dt > T(0)) {
+          for(int i = d; i < n+1; i++)                  t[i] = g(i);
+          for(int i = n+1; i < n+k; i++)                t[i] = t[i-1] + dt;
+      } else
+          for(int i = d; i < n+k; i++)                  t[i] = g(i-d);
+      for(int i = d-1, j = n+d; i >= 0; i--,j--)        t[i] = t[i+1] - (t[j]-t[j-1]);
+      for(int i = n+k, j = k; i < t.getDim(); i++,j++)  t[i] = t[i-1] + (t[j]-t[j-1]);
+      c = true;
+  }
+
+
+  template <typename T>
+  inline
+  void PBSplineCurve<T>::initKnot2( DVector<T>& t, bool& c, const DVector<T>& g, int n, int d) {
+
+      t.setDim(g.getDim()-d);
+      for(int i = d; i <= n; i++)            t[i] = g(i-d);
+      for(int i = d-1; i >= 0; i--)          t[i] = t[i+1];
+      for(int i = n+1; i < t.getDim(); i++)  t[i] = t[i-1];
+      c = false;
+  }
+
+
+
+} // END namespace GMlib
+
+

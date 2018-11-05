@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/main.qml</file>
+        <file>qml/components/HidBindingView.qml</file>
+        <file>qml/components/TextureViewer.qml</file>
+    </qresource>
+</RCC>
