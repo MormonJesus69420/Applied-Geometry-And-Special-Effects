@@ -3,6 +3,7 @@
 
 #include "scenario.h"
 #include "mybsplinecurve.h"
+#include "downeyeffects/bsplinecurve.h"
 
 //// hidmanager
 //#include "hidmanager/defaulthidmanager.h"
@@ -77,18 +78,22 @@ void Scenario::initializeScenario() {
   top_rcpair.renderer->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
 
-      GMlib::DVector< GMlib::Vector<float,3> > cp(8);
-      cp[0]= GMlib::Vector<float,3>(0,0,0); cp[1]= GMlib::Vector<float,3>(1,1,0);
-      cp[2]= GMlib::Vector<float,3>(2,0,2); cp[3]= GMlib::Vector<float,3>(3,2,0);
-      cp[4]= GMlib::Vector<float,3>(4,1,0); cp[5]= GMlib::Vector<float,3>(5,1,-2);
-      cp[6]= GMlib::Vector<float,3>(6,2,0); cp[7]= GMlib::Vector<float,3>(7,0,0);
+  GMlib::DVector< GMlib::Vector<float,3> > cp(8);
+  cp[0]= GMlib::Vector<float,3>(0,0,0); cp[1]= GMlib::Vector<float,3>(1,1,0);
+  cp[2]= GMlib::Vector<float,3>(2,0,2); cp[3]= GMlib::Vector<float,3>(3,2,0);
+  cp[4]= GMlib::Vector<float,3>(4,1,0); cp[5]= GMlib::Vector<float,3>(5,1,-2);
+  cp[6]= GMlib::Vector<float,3>(6,2,0); cp[7]= GMlib::Vector<float,3>(7,0,0);
 
-      auto myBSpline = new mybsplinecurve(cp,3,false);
-      myBSpline->toggleDefaultVisualizer();
-      myBSpline->setColor(GMlib::GMcolor::blueViolet());
-      myBSpline->showSelectors(0.5);
-      myBSpline->sample(100,4);
-      this->scene()->insert(myBSpline);
+//  auto myBSpline = new mybsplinecurve(cp,3,false);
+//  myBSpline->toggleDefaultVisualizer();
+//  myBSpline->setColor(GMlib::GMcolor::blueViolet());
+//  myBSpline->showSelectors(0.5);
+//  myBSpline->sample(100,4);
+//  this->scene()->insert(myBSpline);
+
+
+  auto temp = tardzone::BSplineCurve<float>(cp);
+
 
 
 }

@@ -113,6 +113,8 @@ set( HDRS
   application/window.h
   application/utils.h
 
+  downeyeffects/bsplinecurve.h
+
   scenario.h
   mybsplinecurve.h
   )
@@ -133,6 +135,7 @@ set( SRCS
   application/guiapplication.cpp
   application/window.cpp
   application/main.cpp
+
 
   scenario.cpp
   mybsplinecurve.cpp
