@@ -36,10 +36,10 @@ class BSplineCurve : public GMlib::PCurve<T, 3> {
 
   private:
   // Private functions for BSplineCurve
-  void knotMeDaddy();
-  T wFunction(int d, int i, T t);
-  int findI(T t);
-  GMlib::Vector<T, 4> releaseTheBees(T titty, int& i);
+  GMlib::Vector<T, 4> releaseTheBees(T titty, int& i) const;
+  int theyAreInMyEyes(T t) const;
+  T wtf(int d, int i, T t) const;
+  void knotMeDaddy(int n);
   // Private virtual functions from PCurve
 
   // Private members for BSplineCurve

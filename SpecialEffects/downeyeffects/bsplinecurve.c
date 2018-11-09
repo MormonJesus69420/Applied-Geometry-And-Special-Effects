@@ -1,3 +1,4 @@
+#include <QtDebug>
 #include <stdexcept>
 
 namespace tardzone {
@@ -6,17 +7,17 @@ template <class T>
 BSplineCurve<T>::BSplineCurve(const GMlib::DVector<GMlib::Vector<T, 3>>& c)
     : _c(c)
 {
-  knotMeDaddy();
+  knotMeDaddy(c.getDim());
 }
 
 template <class T>
-BSplineCurve<T>::BSplineCurve(const BSplineCurve<T>& replicant)
+BSplineCurve<T>::BSplineCurve(const GMlib::DVector<GMlib::Vector<T, 3>>& p, int n)
 {
   //TODO
 }
 
 template <class T>
-BSplineCurve<T>::BSplineCurve(const GMlib::DVector<GMlib::Vector<T, 3>>& p, int n)
+BSplineCurve<T>::BSplineCurve(const BSplineCurve<T>& replicant)
 {
   //TODO
 }
@@ -47,10 +48,10 @@ bool BSplineCurve<T>::isClosed() const
 }
 
 template <class T>
-void BSplineCurve<T>::knotMeDaddy()
+void BSplineCurve<T>::knotMeDaddy(int n)
 {
   // Set dimension for t, dim(t) = n+k
-  _t.resize(_c.getDim() + _k);
+  _t.resize(n + _k);
 
   // Initialize value for t at index i to 1
   T ti = T(1);
@@ -67,46 +68,72 @@ void BSplineCurve<T>::knotMeDaddy()
 }
 
 template <class T>
-T BSplineCurve<T>::wFunction(int d, int i, T t)
+T BSplineCurve<T>::wtf(int d, int i, T t) const
 {
   // Check if t is between d and i arguments
-  if (_t[i] > t || t >= _t[i + d])
-    throw std::invalid_argument("Illegal t value received for wFunction. Got: " + t + " legal bounds: " + _t[i] + "-" + _t[i + d]);
+  if (_t[i] <= t && t <= _t[i + d]) {
+    // Calculate W_(d,i)(t) = (t - t_i)/(t_(i+d) - t_i)
+    return (t - _t[i]) / (_t[i + d] - _t[i]);
+  }
 
-  // Calculate W_(d,i)(t) = (t - t_i)/(t_(i+d) - t_i)
-  return (t - _t[i]) / (_t[i + d] - _t[i]);
+  QString err = QString("Illegal t value received for wFunction. Got: %1 legal bounds: %2-%3").arg(t).arg(_t[i]).arg(_t[i + d]);
+  throw std::invalid_argument(err.toStdString());
 }
 
 template <class T>
-int BSplineCurve<T>::findI(T t)
+int BSplineCurve<T>::theyAreInMyEyes(T t) const
 {
   // Check if t is in legal range
-  if (t < getStartP() || t > getEndP())
-    throw std::invalid_argument("Illegal t value received for findI. Got: " + t + " legal bounds: " + getStartP() + "-" + getEndP());
+  if (t < getStartP() || t > getEndP()) {
+    QString err = QString("Illegal t value received for findI. Got: %1 legal bounds: %2-%3").arg(t).arg(getStartP()).arg(getEndP());
+    throw std::invalid_argument(err.toStdString());
+  }
 
   // Start searching at d and get value for n
-  int i = _d, n = _c.getDim();
+  auto i = _d, n = _c.getDim();
 
-  // Increment i while t at i is less than or equal t
-  while (_t[i] <= t)
-    ++i;
+  // Increment i while t at i is less than t (ends up being one interval over)
+  while (_t[i] < t)
+      i++;
 
-  // Check if i is larger or equal to n, decrement by one if so
+  // Check if i is larger or equal to n, set to n then (ends up being one interval over)
   if (n <= i)
-    i = n - 1;
+    i = n;
 
-  return i;
+  // Decrement by one, so i is in correct interval
+  return --i;
 }
 
 template <typename T>
 void BSplineCurve<T>::eval(T t, int d, bool l) const
 {
+  this->_p.setDim(d + 1);
+
+  int i;
+  auto basis = releaseTheBees(t, i);
+
+  this->_p[0] = basis[0] * _c[i - 3] + basis[1] * _c[i - 2] + basis[2] * _c[i - 1] + basis[3] * _c[i];
 }
 
 template <typename T>
-GMlib::Vector<T, 4> BSplineCurve<T>::releaseTheBees(T t, int& i)
+GMlib::Vector<T, 4> BSplineCurve<T>::releaseTheBees(T t, int& i) const
 {
-  return GMlib::Vector<T, 4>();
+  i = theyAreInMyEyes(t);
+
+  auto W1i = wtf(1, i, t), W2i = wtf(2, i, t), W2i1 = wtf(2, i - 1, t);
+  auto W3i2 = wtf(3, i - 2, t), W3i1 = wtf(3, i - 1, t), W3i = wtf(3, i, t);
+
+  auto a = (1 - W1i) * (1 - W2i1);
+  auto b = ((1 - W1i) * W2i1) + (W1i * (1 - W2i));
+  auto c = W1i * W2i;
+
+  GMlib::Vector<T, 4> basis;
+  basis[0] = a * (1 - W3i2);
+  basis[1] = (a * W3i2) + (b * (1 - W3i1));
+  basis[2] = (b * W3i1) + (c * (1 - W3i));
+  basis[3] = c * W3i;
+
+  return basis;
 }
 
 } // namespace tardzone

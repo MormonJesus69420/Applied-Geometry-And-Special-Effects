@@ -84,15 +84,19 @@ void Scenario::initializeScenario() {
   cp[4]= GMlib::Vector<float,3>(4,1,0); cp[5]= GMlib::Vector<float,3>(5,1,-2);
   cp[6]= GMlib::Vector<float,3>(6,2,0); cp[7]= GMlib::Vector<float,3>(7,0,0);
 
-//  auto myBSpline = new mybsplinecurve(cp,3,false);
-//  myBSpline->toggleDefaultVisualizer();
-//  myBSpline->setColor(GMlib::GMcolor::blueViolet());
-//  myBSpline->showSelectors(0.5);
-//  myBSpline->sample(100,4);
-//  this->scene()->insert(myBSpline);
+  auto myBSpline = new mybsplinecurve(cp,3,false);
+  myBSpline->toggleDefaultVisualizer();
+  myBSpline->setColor(GMlib::GMcolor::blueViolet());
+  myBSpline->showSelectors(0.5);
+  myBSpline->sample(100,4);
+  this->scene()->insert(myBSpline);
 
 
-  auto temp = tardzone::BSplineCurve<float>(cp);
+  auto temp = new tardzone::BSplineCurve<float>(cp);
+  temp->toggleDefaultVisualizer();
+  temp->setColor(GMlib::GMcolor::darkMagenta());
+  temp->sample(100,4);
+  this->scene()->insert(temp);
 
 
 
