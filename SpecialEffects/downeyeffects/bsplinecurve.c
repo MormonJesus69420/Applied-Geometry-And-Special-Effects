@@ -1,6 +1,8 @@
 #include <QtDebug>
 #include <stdexcept>
 
+#include "bsplinecurve.h"
+
 namespace tardzone {
 
 template <class T>
@@ -67,17 +69,38 @@ void BSplineCurve<T>::knotMeDaddy(int n)
   }
 }
 
-template <class T>
-T BSplineCurve<T>::wtf(int d, int i, T t) const
+template <typename T>
+void BSplineCurve<T>::eval(T t, int d, bool l) const
 {
-  // Check if t is between d and i arguments
-  if (_t[i] <= t && t <= _t[i + d]) {
-    // Calculate W_(d,i)(t) = (t - t_i)/(t_(i+d) - t_i)
-    return (t - _t[i]) / (_t[i + d] - _t[i]);
-  }
+  // Firstly set dimension for p
+  this->_p.setDim(d + 1);
 
-  QString err = QString("Illegal t value received for wFunction. Got: %1 legal bounds: %2-%3").arg(t).arg(_t[i]).arg(_t[i + d]);
-  throw std::invalid_argument(err.toStdString());
+  // Calculate basis functions and set i based on t
+  int i;
+  auto basis = releaseTheBees(t, i);
+
+  // Set value for p[0]
+  this->_p[0] = basis[0] * _c[i - 3] + basis[1] * _c[i - 2] + basis[2] * _c[i - 1] + basis[3] * _c[i];
+}
+
+template <typename T>
+GMlib::Vector<T, 4> BSplineCurve<T>::releaseTheBees(T t, int& i) const
+{
+  // Calculate i based on t
+  i = theyAreInMyEyes(t);
+
+  // Calculate values for W's used in defining basis functions
+  auto W1i = wtf(1, i, t), W2i = wtf(2, i, t), W2i1 = wtf(2, i - 1, t);
+  auto W3i2 = wtf(3, i - 2, t), W3i1 = wtf(3, i - 1, t), W3i = wtf(3, i, t);
+
+  // Create container for and set in calculated basis functions
+  GMlib::Vector<T, 4> basis;
+  basis[0] = (1 - W1i) * (1 - W2i1) * (1 - W3i2);
+  basis[1] = ((1 - W1i) * (1 - W2i1) * W3i2) + ((((1 - W1i) * W2i1) + (W1i * (1 - W2i))) * (1 - W3i1));
+  basis[2] = ((((1 - W1i) * W2i1) + (W1i * (1 - W2i))) * W3i1) + (W1i * W2i * (1 - W3i));
+  basis[3] = W1i * W2i * W3i;
+
+  return basis;
 }
 
 template <class T>
@@ -85,7 +108,7 @@ int BSplineCurve<T>::theyAreInMyEyes(T t) const
 {
   // Check if t is in legal range
   if (t < getStartP() || t > getEndP()) {
-    QString err = QString("Illegal t value received for findI. Got: %1 legal bounds: %2-%3").arg(t).arg(getStartP()).arg(getEndP());
+    QString err = QString("Illegal t in theyAreInMyEyes. Got: %1, %2-%3 expected").arg(t).arg(getStartP()).arg(getEndP());
     throw std::invalid_argument(err.toStdString());
   }
 
@@ -104,36 +127,17 @@ int BSplineCurve<T>::theyAreInMyEyes(T t) const
   return --i;
 }
 
-template <typename T>
-void BSplineCurve<T>::eval(T t, int d, bool l) const
+template <class T>
+T BSplineCurve<T>::wtf(int d, int i, T t) const
 {
-  this->_p.setDim(d + 1);
+  // Check if t is between d and i arguments
+  if (_t[i] <= t && t <= _t[i + d]) {
+    // Calculate W_(d,i)(t) = (t - t_i)/(t_(i+d) - t_i)
+    return (t - _t[i]) / (_t[i + d] - _t[i]);
+  }
 
-  int i;
-  auto basis = releaseTheBees(t, i);
-
-  this->_p[0] = basis[0] * _c[i - 3] + basis[1] * _c[i - 2] + basis[2] * _c[i - 1] + basis[3] * _c[i];
-}
-
-template <typename T>
-GMlib::Vector<T, 4> BSplineCurve<T>::releaseTheBees(T t, int& i) const
-{
-  i = theyAreInMyEyes(t);
-
-  auto W1i = wtf(1, i, t), W2i = wtf(2, i, t), W2i1 = wtf(2, i - 1, t);
-  auto W3i2 = wtf(3, i - 2, t), W3i1 = wtf(3, i - 1, t), W3i = wtf(3, i, t);
-
-  auto a = (1 - W1i) * (1 - W2i1);
-  auto b = ((1 - W1i) * W2i1) + (W1i * (1 - W2i));
-  auto c = W1i * W2i;
-
-  GMlib::Vector<T, 4> basis;
-  basis[0] = a * (1 - W3i2);
-  basis[1] = (a * W3i2) + (b * (1 - W3i1));
-  basis[2] = (b * W3i1) + (c * (1 - W3i));
-  basis[3] = c * W3i;
-
-  return basis;
+  QString err = QString("Illegal t wtf. Got: %1, %2-%3 expected").arg(t).arg(_t[i]).arg(_t[i + d]);
+  throw std::invalid_argument(err.toStdString());
 }
 
 } // namespace tardzone
