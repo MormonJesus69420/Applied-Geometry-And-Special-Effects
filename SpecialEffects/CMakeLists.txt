@@ -115,9 +115,10 @@ set( HDRS
   application/utils.h
 
   downeyeffects/bsplinecurve.h
+  downeyeffects/blendingcurve.h
 
   scenario.h
-  mybsplinecurve.h
+  defaultsplinecurve.h
   )
 
 set( SRCS
@@ -137,9 +138,8 @@ set( SRCS
   application/window.cpp
   application/main.cpp
 
-
   scenario.cpp
-  mybsplinecurve.cpp
+  defaultsplinecurve.cpp
   )
 
 #########

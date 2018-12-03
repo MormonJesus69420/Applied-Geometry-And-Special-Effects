@@ -1,6 +1,6 @@
-#include "mybsplinecurve.h"
+#include "defaultsplinecurve.h"
 
-void mybsplinecurve::localSimulate(double dt)
+void defaultsplinecurve::localSimulate(double dt)
 {
 //    rotate(GMlib::Angle(90) *dt, GMlib::Vector<float,3>(1.0f,0.0f,0.0f));
 }

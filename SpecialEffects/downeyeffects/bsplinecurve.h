@@ -56,7 +56,7 @@ class BSplineCurve : public GMlib::PCurve<T, 3> {
 
 } // namespace tardzone
 
-// Include PCurve class function implementations
+// Include BSplineCurve class function implementations
 #include "bsplinecurve.c"
 
 #endif
