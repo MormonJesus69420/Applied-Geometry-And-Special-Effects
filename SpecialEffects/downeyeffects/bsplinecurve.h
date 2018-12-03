@@ -11,7 +11,6 @@ class BSplineCurve : public GMlib::PCurve<T, 3> {
 
   public:
   // Public functions for BSplineCurve
-
   // Use c as control points - and generate a knotvector
   BSplineCurve(const GMlib::DVector<GMlib::Vector<T, 3>>& c);
   // Use least square to make n control points - and generate a knotvector
@@ -36,15 +35,22 @@ class BSplineCurve : public GMlib::PCurve<T, 3> {
 
   private:
   // Private functions for BSplineCurve
-  GMlib::Vector<T, 4> releaseTheBees(T titty, int& i) const;
-  int theyAreInMyEyes(T t) const;
-  T wtf(int d, int i, T t) const;
-  void knotMeDaddy(int n);
+  void createCP(const GMlib::DVector<GMlib::Vector<T, 3>>& p);
+  GMlib::DMatrix<T> calculateAMatrix();
+  GMlib::Vector<T, 4> createBees(T t, int& i) const;
+  T wFunction(int d, int i, T t) const;
+  int iFinder(T t) const;
+  void createKnots();
   // Private virtual functions from PCurve
 
   // Private members for BSplineCurve
+  // Control points
   GMlib::DVector<GMlib::Vector<T, 3>> _c;
+  // Knot vector
   std::vector<T> _t;
+  // Dimensions for A matrix, n also # control points
+  int _n, _m;
+  // Degree and order
   const int _d = 3, _k = _d + 1;
 };
 
