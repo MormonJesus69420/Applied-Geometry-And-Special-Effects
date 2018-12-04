@@ -21,8 +21,6 @@
 **********************************************************************************/
 
 
-
-
 namespace GMlib {
 
 
@@ -41,7 +39,6 @@ namespace GMlib {
  *  \param[in] e      The end parameter value of the sub curve
  */
   template <typename T>
-  inline
   PSubCurve<T>::PSubCurve( PCurve<T,3>* c, T s, T e ) : PCurve<T,3>(20, 0, c->getDerivativesImplemnted()) {
 
     set(c, s, e, (e+s)/2);
@@ -138,7 +135,7 @@ namespace GMlib {
    */
   template <typename T>
   void PSubCurve<T>::updateMat() const {
-     this->_mat = this->_matrix;
+     this->_mat = this->_matrix.template toType<float>();
      this->_mat.translate(-_trans);
   }
 

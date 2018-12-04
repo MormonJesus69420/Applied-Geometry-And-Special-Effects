@@ -115,7 +115,7 @@ GMlib::DMatrix<T> BSplineCurve<T>::calculateAMatrix()
 }
 
 template <typename T>
-void BSplineCurve<T>::eval(T t, int d, bool l) const
+void BSplineCurve<T>::eval(T t, int d, bool fromLeft) const
 {
   // Firstly set dimension for p
   this->_p.setDim(d + 1);

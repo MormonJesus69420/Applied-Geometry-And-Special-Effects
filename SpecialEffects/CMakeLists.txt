@@ -98,69 +98,70 @@ endif(WIN32)
 #######
 # Files
 set( HDRS
-  hidmanager/hidaction.h
-  hidmanager/hidbinding.h
-  hidmanager/hidinput.h
-  hidmanager/hidinputevent.h
-  hidmanager/hidkbmouseinput.h
-  hidmanager/hidmanager.h
   hidmanager/hidmanagertreemodel.h
   hidmanager/standardhidmanager.h
   hidmanager/defaulthidmanager.h
+  hidmanager/hidkbmouseinput.h
+  hidmanager/hidinputevent.h
+  hidmanager/hidbinding.h
+  hidmanager/hidmanager.h
+  hidmanager/hidaction.h
+  hidmanager/hidinput.h
 
   application/fboinsgrenderer.h
-  application/gmlibwrapper.h
   application/guiapplication.h
+  application/gmlibwrapper.h
   application/window.h
   application/utils.h
 
-  downeyeffects/bsplinecurve.h
   downeyeffects/blendingcurve.h
+  downeyeffects/bsplinecurve.h
+  downeyeffects/gerbs.h
 
-  scenario.h
   defaultsplinecurve.h
+  scenario.h
   )
 
 set( SRCS
-  hidmanager/hidaction.cpp
-  hidmanager/hidbinding.cpp
-  hidmanager/hidinput.cpp
-  hidmanager/hidinputevent.cpp
-  hidmanager/hidkbmouseinput.cpp
-  hidmanager/hidmanager.cpp
   hidmanager/hidmanagertreemodel.cpp
   hidmanager/standardhidmanager.cpp
   hidmanager/defaulthidmanager.cpp
+  hidmanager/hidkbmouseinput.cpp
+  hidmanager/hidinputevent.cpp
+  hidmanager/hidbinding.cpp
+  hidmanager/hidmanager.cpp
+  hidmanager/hidaction.cpp
+  hidmanager/hidinput.cpp
 
   application/fboinsgrenderer.cpp
-  application/gmlibwrapper.cpp
   application/guiapplication.cpp
+  application/gmlibwrapper.cpp
   application/window.cpp
   application/main.cpp
 
-  scenario.cpp
   defaultsplinecurve.cpp
+  scenario.cpp
   )
 
 #########
 # Moc'ing
 QT5_WRAP_CPP( HDRS_MOC
-  hidmanager/hidaction.h
-  hidmanager/hidmanager.h
   hidmanager/hidmanagertreemodel.h
   hidmanager/standardhidmanager.h
   hidmanager/defaulthidmanager.h
+  hidmanager/hidmanager.h
+  hidmanager/hidaction.h
 
   application/fboinsgrenderer.h
-  application/gmlibwrapper.h
   application/guiapplication.h
+  application/gmlibwrapper.h
   application/window.h
 
   scenario.h
   )
 
 set( RCCS
- application/application.qrc
+  application/application.qrc
 )
 
 QT5_ADD_RESOURCES( RCCS_MOC ${RCCS} )

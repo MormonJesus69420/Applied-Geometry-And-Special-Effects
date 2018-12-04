@@ -52,7 +52,7 @@ class Scenario : public GMlibWrapper {
   std::shared_ptr<tardzone::BlendingCurve<float>> _blending50Curve;
   std::shared_ptr<tardzone::BlendingCurve<float>> _blending20Curve;
 
-  int counter = 1, max = 3;
+  int counter = 0, max = 3;
 };
 
 #endif // SCENARIO_H

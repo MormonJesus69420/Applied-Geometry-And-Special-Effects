@@ -34,7 +34,6 @@ class BlendingCurve : public GMlib::PCurve<T, 3> {
   private:
   // Private functions for BlendingCurve
   T blendingFunction (T t) const;
-  bool checkStateChange();
 
   // Private virtual functions from PCurve
 
@@ -43,8 +42,6 @@ class BlendingCurve : public GMlib::PCurve<T, 3> {
   std::shared_ptr<GMlib::PCurve<T,3>> _c1;
   // Second curve
   std::shared_ptr<GMlib::PCurve<T,3>> _c2;
-  // Lengths of curves (used to check state change)
-  float _l1, _l2;
   // Blending point
   T _blendpoint;
 };

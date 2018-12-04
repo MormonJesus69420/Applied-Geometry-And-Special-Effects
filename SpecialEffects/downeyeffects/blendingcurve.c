@@ -6,13 +6,11 @@
 namespace tardzone {
 
 template <typename T>
-BlendingCurve<T>::BlendingCurve(std::shared_ptr<GMlib::PCurve<T,3>> c1, std::shared_ptr<GMlib::PCurve<T,3>> c2, T blendpoint)
+BlendingCurve<T>::BlendingCurve(std::shared_ptr<GMlib::PCurve<T, 3>> c1, std::shared_ptr<GMlib::PCurve<T, 3>> c2, T blendpoint)
     : _c1(c1)
     , _c2(c2)
     , _blendpoint(blendpoint)
 {
-  _l1 = c1->getCurveLength();
-  _l2 = c2->getCurveLength();
 }
 
 template <typename T>
@@ -46,6 +44,7 @@ template <typename T>
 T BlendingCurve<T>::blendingFunction(T t) const
 {
   // I am using Polynomial Blending function, since it easy to derivate it if I need to
+
   return (3 * t * t) - (2 * t * t * t);
 }
 
@@ -73,23 +72,7 @@ void BlendingCurve<T>::eval(T t, int d, bool fromLeft) const
 template <typename T>
 void BlendingCurve<T>::localSimulate(double dt [[maybe_unused]])
 {
-  if (checkStateChange())
-    this->sample(100, 4);
-}
-
-template <typename T>
-bool BlendingCurve<T>::checkStateChange()
-{
-  float l1 = _c1->getCurveLength();
-  float l2 = _c2->getCurveLength();
-
-  if (fabs(_l1 - l1) > 0.0001f || fabs(_l2 - l2) > 0.0001f) {
-    _l1 = l1;
-    _l2 = l2;
-    return true;
-  }
-
-  return false;
+  this->sample(100, 4);
 }
 
 } // namespace tardzone

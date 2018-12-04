@@ -27,7 +27,7 @@ class BSplineCurve : public GMlib::PCurve<T, 3> {
   // Protected functions for BSplineCurve
 
   // Protected virtual functions from PCurve
-  void eval(T t, int d, bool l) const override;
+  void eval(T t, int d, bool fromLeft) const override;
   T getStartP() const override;
   T getEndP() const override;
 

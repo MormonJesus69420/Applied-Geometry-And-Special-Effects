@@ -80,8 +80,7 @@ void Scenario::initializeScenario()
   initBSplineSampling();
   initBlending();
 
-  scene()->insert(_controlDefCurve.get());
-  scene()->insert(_controlMyCurve.get());
+  toggleSimulation();
 }
 
 void Scenario::cleanupScenario()
@@ -173,10 +172,10 @@ void Scenario::initBSplineSampling()
 void Scenario::initBlending()
 {
   GMlib::DVector<GMlib::Vector<float, 3>> cp1(4);
-  cp1[0] = GMlib::Vector<float, 3>(-12, 0, 0);
-  cp1[1] = GMlib::Vector<float, 3>(-9, 0, 0);
-  cp1[2] = GMlib::Vector<float, 3>(-6, 0, 0);
-  cp1[3] = GMlib::Vector<float, 3>(-3, 0, 0);
+  cp1[0] = GMlib::Vector<float, 3>(-12, -1, -3);
+  cp1[1] = GMlib::Vector<float, 3>(-9, 1, 3);
+  cp1[2] = GMlib::Vector<float, 3>(-6, 2, 3);
+  cp1[3] = GMlib::Vector<float, 3>(-3, -3, -2);
 
   _blendCurve1 = std::make_shared<GMlib::PBezierCurve<float>>(cp1);
   _blendCurve1->toggleDefaultVisualizer();
@@ -185,10 +184,10 @@ void Scenario::initBlending()
   _blendCurve1->showSelectors(0.5);
 
   GMlib::DVector<GMlib::Vector<float, 3>> cp2(4);
-  cp2[0] = GMlib::Vector<float, 3>(3, 0, 2);
-  cp2[1] = GMlib::Vector<float, 3>(6, 0, 2);
-  cp2[2] = GMlib::Vector<float, 3>(9, 0, 2);
-  cp2[3] = GMlib::Vector<float, 3>(12, 0, 2);
+  cp2[0] = GMlib::Vector<float, 3>(3, 0, 3);
+  cp2[1] = GMlib::Vector<float, 3>(6, -1, -3);
+  cp2[2] = GMlib::Vector<float, 3>(9, -1, -3);
+  cp2[3] = GMlib::Vector<float, 3>(12, 0, 3);
 
   _blendCurve2 = std::make_shared<GMlib::PBezierCurve<float>>(cp2);
   _blendCurve2->toggleDefaultVisualizer();
@@ -214,7 +213,6 @@ void Scenario::initBlending()
 
 void Scenario::callDefferedGL()
 {
-
   GMlib::Array<const GMlib::SceneObject*> e_obj;
   this->scene()->getEditedObjects(e_obj);
 
