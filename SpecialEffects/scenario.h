@@ -11,6 +11,10 @@ template <typename T>
 class BSplineCurve;
 template <typename T>
 class BlendingCurve;
+template <typename T>
+class GERBSCurve;
+template <typename T>
+class ModelCurve;
 }
 
 namespace GMlib {
@@ -34,11 +38,11 @@ class Scenario : public GMlibWrapper {
   void callDefferedGL();
   void toggleSimulation();
 
-
   private:
   void initBSplineControl();
   void initBSplineSampling();
   void initBlending();
+  void initGoebbels();
 
   std::shared_ptr<defaultsplinecurve> _controlDefCurve;
   std::shared_ptr<tardzone::BSplineCurve<float>> _controlMyCurve;
@@ -52,7 +56,10 @@ class Scenario : public GMlibWrapper {
   std::shared_ptr<tardzone::BlendingCurve<float>> _blending50Curve;
   std::shared_ptr<tardzone::BlendingCurve<float>> _blending20Curve;
 
-  int counter = 0, max = 3;
+  std::shared_ptr<tardzone::GERBSCurve<float>> _gerbsCurve;
+  std::shared_ptr<tardzone::ModelCurve<float>> _butterfly;
+
+  int counter = 0, max = 4;
 };
 
 #endif // SCENARIO_H

@@ -72,7 +72,7 @@ void BlendingCurve<T>::eval(T t, int d, bool fromLeft) const
 template <typename T>
 void BlendingCurve<T>::localSimulate(double dt [[maybe_unused]])
 {
-  this->sample(100, 4);
+  this->resample();
 }
 
 } // namespace tardzone

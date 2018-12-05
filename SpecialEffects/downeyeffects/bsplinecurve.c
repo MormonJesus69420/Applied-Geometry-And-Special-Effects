@@ -173,7 +173,7 @@ int BSplineCurve<T>::iFinder(T t) const
 }
 
 template <typename T>
-T BSplineCurve<T>::wFunction(int d, int i, T t) const
+T BSplineCurve<T>::wFunction(const int& d, const int& i, T t) const
 {
   // Check if t is between d and i arguments
   if (_t[i] <= t && t <= _t[i + d]) {

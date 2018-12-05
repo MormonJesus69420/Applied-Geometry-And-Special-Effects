@@ -38,7 +38,7 @@ class BSplineCurve : public GMlib::PCurve<T, 3> {
   void createCP(const GMlib::DVector<GMlib::Vector<T, 3>>& p);
   GMlib::DMatrix<T> calculateAMatrix();
   GMlib::Vector<T, 4> createBees(T t, int& i) const;
-  T wFunction(int d, int i, T t) const;
+  T wFunction(const int& d, const int& i, T t) const;
   int iFinder(T t) const;
   void createKnots();
   // Private virtual functions from PCurve

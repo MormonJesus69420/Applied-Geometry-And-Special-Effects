@@ -3,6 +3,8 @@
 #include "defaultsplinecurve.h"
 #include "downeyeffects/blendingcurve.h"
 #include "downeyeffects/bsplinecurve.h"
+#include "downeyeffects/modelcurve.h"
+#include "downeyeffects/gerbs.h"
 #include "scenario.h"
 
 // hidmanager
@@ -79,6 +81,7 @@ void Scenario::initializeScenario()
   initBSplineControl();
   initBSplineSampling();
   initBlending();
+  initGoebbels();
 
   toggleSimulation();
 }
@@ -99,6 +102,10 @@ void Scenario::cleanupScenario()
     scene()->remove(_blending80Curve.get());
     scene()->remove(_blending50Curve.get());
     scene()->remove(_blending20Curve.get());
+  }
+  else if (counter == 4) {
+    scene()->remove(_butterfly.get());
+    scene()->remove(_gerbsCurve.get());
   }
 }
 
@@ -122,6 +129,10 @@ void Scenario::toggleSimulation()
     scene()->insert(_blending80Curve.get());
     scene()->insert(_blending50Curve.get());
     scene()->insert(_blending20Curve.get());
+  }
+  else if (counter == 4) {
+    scene()->insert(_butterfly.get());
+    scene()->insert(_gerbsCurve.get());
   }
 }
 
@@ -152,7 +163,7 @@ void Scenario::initBSplineControl()
 void Scenario::initBSplineSampling()
 {
   _samplingCircle = std::make_shared<GMlib::PCircle<float>>(5);
-  _samplingCircle->rotate(GMlib::Angle(M_PI/2.0), GMlib::Vector<float,3>(1,0,0), false);
+  _samplingCircle->rotate(GMlib::Angle(M_PI / 2.0), GMlib::Vector<float, 3>(1, 0, 0), false);
   _samplingCircle->toggleDefaultVisualizer();
   _samplingCircle->sample(100, 0);
 
@@ -163,7 +174,7 @@ void Scenario::initBSplineSampling()
   }
 
   _samplingCurve = std::make_shared<tardzone::BSplineCurve<float>>(sample, 15);
-  _samplingCurve->rotate(GMlib::Angle(M_PI/2.0), GMlib::Vector<float,3>(1,0,0), false);
+  _samplingCurve->rotate(GMlib::Angle(M_PI / 2.0), GMlib::Vector<float, 3>(1, 0, 0), false);
   _samplingCurve->toggleDefaultVisualizer();
   _samplingCurve->setColor(GMlib::GMcolor::darkMagenta());
   _samplingCurve->sample(100, 0);
@@ -209,6 +220,19 @@ void Scenario::initBlending()
   _blending20Curve->toggleDefaultVisualizer();
   _blending20Curve->setColor(GMlib::GMcolor::aqua());
   _blending20Curve->sample(100, 0);
+}
+
+void Scenario::initGoebbels()
+{
+  _butterfly = std::make_shared<tardzone::ModelCurve<float>>(3);
+  _butterfly->toggleDefaultVisualizer();
+  _butterfly->setColor(GMlib::GMcolor::blueViolet());
+  _butterfly->setCollapsed(true);
+  _butterfly->sample(10000, 0);
+
+  _gerbsCurve = std::make_shared<tardzone::GERBSCurve<float>>(_butterfly.get(), 100);
+  _gerbsCurve->toggleDefaultVisualizer();
+  _gerbsCurve->sample(10000, 0);
 }
 
 void Scenario::callDefferedGL()
