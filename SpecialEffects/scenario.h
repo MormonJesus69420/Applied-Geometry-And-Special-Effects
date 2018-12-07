@@ -6,24 +6,31 @@
 // qt
 #include <QObject>
 
+// Forward declaration of classes used from tardzone
 namespace tardzone {
 template <typename T>
 class BSplineCurve;
 template <typename T>
 class BlendingCurve;
 template <typename T>
+class GERBSSurface;
+template <typename T>
 class GERBSCurve;
 template <typename T>
 class ModelCurve;
 }
 
+// Forward declaration of classes used from GMlib
 namespace GMlib {
 template <typename T>
 class PBezierCurve;
 template <typename T>
 class PCircle;
+template <typename T>
+class PTorus;
 }
 
+// Forward declaration of classes used from source folder of project
 class defaultsplinecurve;
 
 class Scenario : public GMlibWrapper {
@@ -43,6 +50,7 @@ class Scenario : public GMlibWrapper {
   void initBSplineSampling();
   void initBlending();
   void initGoebbels();
+  void initSurface();
 
   std::shared_ptr<defaultsplinecurve> _controlDefCurve;
   std::shared_ptr<tardzone::BSplineCurve<float>> _controlMyCurve;
@@ -59,7 +67,11 @@ class Scenario : public GMlibWrapper {
   std::shared_ptr<tardzone::GERBSCurve<float>> _gerbsCurve;
   std::shared_ptr<tardzone::ModelCurve<float>> _heart;
 
-  int counter = 0, max = 4;
+  std::shared_ptr<tardzone::GERBSSurface<float>> _gerbsSurface;
+  std::shared_ptr<GMlib::PTorus<float>> _torus;
+
+  int counter = 0;
+  const int max = 5;
 };
 
 #endif // SCENARIO_H

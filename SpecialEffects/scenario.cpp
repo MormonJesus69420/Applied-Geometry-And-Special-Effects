@@ -3,8 +3,9 @@
 #include "defaultsplinecurve.h"
 #include "downeyeffects/blendingcurve.h"
 #include "downeyeffects/bsplinecurve.h"
+#include "downeyeffects/gerbscurve.h"
+#include "downeyeffects/gerbssurf.h"
 #include "downeyeffects/modelcurve.h"
-#include "downeyeffects/gerbs.h"
 #include "scenario.h"
 
 // hidmanager
@@ -33,7 +34,7 @@ void Scenario::initializeScenario()
 {
 
   // Insert a light
-  GMlib::Point<GLfloat, 3> init_light_pos(2.0, 4.0, 10);
+  GMlib::Point<GLfloat, 3> init_light_pos(2.0, -4.0, 10);
   GMlib::PointLight* light = new GMlib::PointLight(GMlib::GMcolor::white(), GMlib::GMcolor::white(),
       GMlib::GMcolor::white(), init_light_pos);
   light->setAttenuation(0.8f, 0.002f, 0.0008f);
@@ -82,6 +83,7 @@ void Scenario::initializeScenario()
   initBSplineSampling();
   initBlending();
   initGoebbels();
+  initSurface();
 
   toggleSimulation();
 }
@@ -106,6 +108,10 @@ void Scenario::cleanupScenario()
   else if (counter == 4) {
     scene()->remove(_heart.get());
     scene()->remove(_gerbsCurve.get());
+  }
+  else if (counter == 5) {
+    scene()->remove(_torus.get());
+    scene()->remove(_gerbsSurface.get());
   }
 }
 
@@ -134,23 +140,27 @@ void Scenario::toggleSimulation()
     scene()->insert(_heart.get());
     scene()->insert(_gerbsCurve.get());
   }
+  else if (counter == 5) {
+    scene()->insert(_torus.get());
+    scene()->insert(_gerbsSurface.get());
+  }
 }
 
 void Scenario::initBSplineControl()
 {
   GMlib::DVector<GMlib::Vector<float, 3>> cp(8);
-  cp[0] = GMlib::Vector<float, 3>(0, 0, 0);
-  cp[1] = GMlib::Vector<float, 3>(1, 1, 0);
-  cp[2] = GMlib::Vector<float, 3>(2, 0, 2);
-  cp[3] = GMlib::Vector<float, 3>(3, 2, 0);
-  cp[4] = GMlib::Vector<float, 3>(4, 1, 0);
-  cp[5] = GMlib::Vector<float, 3>(5, 1, -2);
-  cp[6] = GMlib::Vector<float, 3>(6, 2, 0);
-  cp[7] = GMlib::Vector<float, 3>(7, 0, 0);
+  cp[0] = GMlib::Vector<float, 3>(-10, 2, 1);
+  cp[1] = GMlib::Vector<float, 3>(-7, -3, 0);
+  cp[2] = GMlib::Vector<float, 3>(-4, 2, 2);
+  cp[3] = GMlib::Vector<float, 3>(-1, -2, -3);
+  cp[4] = GMlib::Vector<float, 3>(1, 3, 5);
+  cp[5] = GMlib::Vector<float, 3>(4, -4, -3);
+  cp[6] = GMlib::Vector<float, 3>(5, 3, 0);
+  cp[7] = GMlib::Vector<float, 3>(10, -1, 0);
 
   _controlDefCurve = std::make_shared<defaultsplinecurve>(cp, 3, false);
   _controlDefCurve->toggleDefaultVisualizer();
-  _controlDefCurve->setColor(GMlib::GMcolor::blueViolet());
+  _controlDefCurve->setColor(GMlib::GMcolor::cyan());
   _controlDefCurve->showSelectors(0.5);
   _controlDefCurve->sample(100, 0);
 
@@ -162,18 +172,19 @@ void Scenario::initBSplineControl()
 
 void Scenario::initBSplineSampling()
 {
-  _samplingCircle = std::make_shared<GMlib::PCircle<float>>(5);
-  _samplingCircle->rotate(GMlib::Angle(M_PI / 2.0), GMlib::Vector<float, 3>(1, 0, 0), false);
+  _samplingCircle = std::make_shared<GMlib::PCircle<float>>(9);
+  _samplingCircle->setColor(GMlib::GMcolor::cyan());
+  _samplingCircle->rotateGlobal(M_PI / 2.0, {1.0f, 0.0f, 0.0f});
   _samplingCircle->toggleDefaultVisualizer();
   _samplingCircle->sample(100, 0);
 
-  GMlib::DVector<GMlib::Vector<float, 3>> sample(250);
+  GMlib::DVector<GMlib::Vector<float, 3>> sample(100);
   float step = float(M_2PI / (sample.getDim() - 1));
   for (int i = 0; i < sample.getDim(); i++) {
     sample[i] = _samplingCircle->getPosition(i * step);
   }
 
-  _samplingCurve = std::make_shared<tardzone::BSplineCurve<float>>(sample, 15);
+  _samplingCurve = std::make_shared<tardzone::BSplineCurve<float>>(sample, 10);
   _samplingCurve->rotate(GMlib::Angle(M_PI / 2.0), GMlib::Vector<float, 3>(1, 0, 0), false);
   _samplingCurve->toggleDefaultVisualizer();
   _samplingCurve->setColor(GMlib::GMcolor::darkMagenta());
@@ -190,7 +201,7 @@ void Scenario::initBlending()
 
   _blendCurve1 = std::make_shared<GMlib::PBezierCurve<float>>(cp1);
   _blendCurve1->toggleDefaultVisualizer();
-  _blendCurve1->setColor(GMlib::GMcolor::blueViolet());
+  _blendCurve1->setColor(GMlib::GMcolor::cyan());
   _blendCurve1->sample(100, 3);
   _blendCurve1->showSelectors(0.5);
 
@@ -202,37 +213,51 @@ void Scenario::initBlending()
 
   _blendCurve2 = std::make_shared<GMlib::PBezierCurve<float>>(cp2);
   _blendCurve2->toggleDefaultVisualizer();
-  _blendCurve2->setColor(GMlib::GMcolor::lightGreen());
+  _blendCurve2->setColor(GMlib::GMcolor::limeGreen());
   _blendCurve2->sample(100, 3);
   _blendCurve2->showSelectors(0.5);
 
   _blending80Curve = std::make_shared<tardzone::BlendingCurve<float>>(_blendCurve1, _blendCurve2, 0.8f);
   _blending80Curve->toggleDefaultVisualizer();
-  _blending80Curve->setColor(GMlib::GMcolor::gold());
+  _blending80Curve->setColor(GMlib::GMcolor::darkMagenta());
   _blending80Curve->sample(100, 0);
 
   _blending50Curve = std::make_shared<tardzone::BlendingCurve<float>>(_blendCurve1, _blendCurve2, 0.5f);
   _blending50Curve->toggleDefaultVisualizer();
-  _blending50Curve->setColor(GMlib::GMcolor::darkMagenta());
+  _blending50Curve->setColor(GMlib::GMcolor::pink());
   _blending50Curve->sample(100, 0);
 
   _blending20Curve = std::make_shared<tardzone::BlendingCurve<float>>(_blendCurve1, _blendCurve2, 0.2f);
   _blending20Curve->toggleDefaultVisualizer();
-  _blending20Curve->setColor(GMlib::GMcolor::aqua());
+  _blending20Curve->setColor(GMlib::GMcolor::crimson());
   _blending20Curve->sample(100, 0);
 }
 
 void Scenario::initGoebbels()
 {
-  _heart = std::make_shared<tardzone::ModelCurve<float>>(0.75);
+  _heart = std::make_shared<tardzone::ModelCurve<float>>(0.70);
   _heart->toggleDefaultVisualizer();
-  _heart->setColor(GMlib::GMcolor::blueViolet());
+  _heart->setColor(GMlib::GMcolor::cyan());
   _heart->setCollapsed(true);
   _heart->sample(100, 0);
 
   _gerbsCurve = std::make_shared<tardzone::GERBSCurve<float>>(_heart.get(), 10);
   _gerbsCurve->toggleDefaultVisualizer();
   _gerbsCurve->sample(100, 0);
+}
+
+void Scenario::initSurface()
+{
+  _torus = std::make_shared<GMlib::PTorus<float>>(7.5f, 2.5f, 2.5f);
+  _torus->rotateGlobal(M_PI/2.0, {1.0f,0.0f,0.0f});
+  _torus->setMaterial(GMlib::GMmaterial::ruby());
+  _torus->toggleDefaultVisualizer();
+  _torus->replot(50, 50, 1, 1);
+
+//  _gerbsSurface = std::make_shared<tardzone::GERBSSurface<float>>(_torus.get(), 10, 10);
+//  _gerbsSurface->setMaterial(GMlib::GMmaterial::brass());
+//  _gerbsSurface->toggleDefaultVisualizer();
+//  _gerbsSurface->replot(50, 50, 1, 1);
 }
 
 void Scenario::callDefferedGL()

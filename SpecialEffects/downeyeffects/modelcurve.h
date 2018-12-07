@@ -10,7 +10,7 @@ class ModelCurve : public GMlib::PCurve<T, 3> {
   GM_SCENEOBJECT(ModelCurve)
 
   public:
-  // Public functions for BSplineCurve
+  // Public functions for ModelCurve
   ModelCurve(T size = T(4));
   ModelCurve(const ModelCurve<T>& replicant);
   virtual ~ModelCurve();
@@ -21,24 +21,24 @@ class ModelCurve : public GMlib::PCurve<T, 3> {
   // Public virtual functions from PCurve
   bool isClosed() const override;
 
-  // Public members for BSplineCurve
+  // Public members for ModelCurve
 
   protected:
-  // Protected functions for BSplineCurve
+  // Protected functions for ModelCurve
 
   // Protected virtual functions from PCurve
   void eval(T t, int d, bool fromLeft) const override;
   T getStartP() const override;
   T getEndP() const override;
 
-  // Protected members for BSplineCurve
+  // Protected members for ModelCurve
 
   private:
-  // Private functions for BSplineCurve
+  // Private functions for ModelCurve
 
   // Private virtual functions from PCurve
 
-  // Private members for BSplineCurve
+  // Private members for ModelCurve
   T _size;
 };
 

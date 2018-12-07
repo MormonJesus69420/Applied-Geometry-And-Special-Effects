@@ -115,9 +115,11 @@ set( HDRS
   application/utils.h
 
   downeyeffects/blendingcurve.h
+  downeyeffects/simplesubsurf.h
   downeyeffects/bsplinecurve.h
+  downeyeffects/gerbscurve.h
   downeyeffects/modelcurve.h
-  downeyeffects/gerbs.h
+  downeyeffects/gerbssurf.h
 
   defaultsplinecurve.h
   scenario.h

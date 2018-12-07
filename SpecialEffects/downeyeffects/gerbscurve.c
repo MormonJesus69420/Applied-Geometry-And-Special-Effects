@@ -1,7 +1,7 @@
 #include <QtDebug>
 #include <stdexcept>
 
-#include "gerbs.h"
+#include "gerbscurve.h"
 
 namespace tardzone {
 template <typename T>
@@ -192,10 +192,14 @@ T GERBSCurve<T>::wFunction(const int& d, const int& i, T t) const
 template <typename T>
 void GERBSCurve<T>::localSimulate(double dt)
 {
-  // If hue is over 1 or under 0 switch the value changing
-  if (_hue < 0.0 || _hue > 1.0) {
-    _up = !_up;
-    _hue = std::round(_hue);
+  // If hue is over 1 or under 0 switch the up variable
+  if (_hue <= 0.0) {
+    _hue = 0.0;
+    _up = true;
+  }
+  else if (_hue >= 1.0) {
+    _hue = 1.0;
+    _up = false;
   }
 
   // Change colour value based on hue

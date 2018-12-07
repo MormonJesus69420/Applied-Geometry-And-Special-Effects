@@ -1,5 +1,5 @@
-#ifndef TARDZONE_GERBS_H
-#define TARDZONE_GERBS_H
+#ifndef TARDZONE_GERBSCURVE_H
+#define TARDZONE_GERBSCURVE_H
 
 #include <memory>
 #include <parametrics/gmpcurve.h>
@@ -12,7 +12,7 @@ class GERBSCurve : public GMlib::PCurve<T, 3> {
   GM_SCENEOBJECT(GERBSCurve)
 
   public:
-  // Public functions for BSplineCurve
+  // Public functions for GERBSCurve
   GERBSCurve(GMlib::PCurve<T, 3>* model, int m);
   GERBSCurve(const GERBSCurve<T>& replicant);
   virtual ~GERBSCurve();
@@ -20,10 +20,10 @@ class GERBSCurve : public GMlib::PCurve<T, 3> {
   // Public virtual functions from PCurve
   bool isClosed() const override;
 
-  // Public members for BSplineCurve
+  // Public members for GERBSCurve
 
   protected:
-  // Protected functions for BSplineCurve
+  // Protected functions for GERBSCurve
   void localSimulate(double dt) override;
 
   // Protected virtual functions from PCurve
@@ -31,10 +31,10 @@ class GERBSCurve : public GMlib::PCurve<T, 3> {
   T getStartP() const override;
   T getEndP() const override;
 
-  // Protected members for BSplineCurve
+  // Protected members for GERBSCurve
 
   private:
-  // Private functions for BSplineCurve
+  // Private functions for GERBSCurve
   T wFunction(const int& d, const int& i, T t) const;
   T blendingFunction(T t) const;
   int iFinder(T t) const;
@@ -43,7 +43,7 @@ class GERBSCurve : public GMlib::PCurve<T, 3> {
 
   // Private virtual functions from PCurve
 
-  // Private members for BSplineCurve
+  // Private members for GERBSCurve
   std::vector<std::shared_ptr<GMlib::PCurve<T, 3>>> _c;
   GMlib::PCurve<T, 3>* _modelCurve;
   const int _d = 1, _k = _d + 1;
@@ -63,7 +63,7 @@ class GERBSCurve : public GMlib::PCurve<T, 3> {
 
 } // namespace tardzone
 
-// Include GERBS class function implementations
-#include "gerbs.c"
+// Include GERBSCurve class function implementations
+#include "gerbscurve.c"
 
 #endif
