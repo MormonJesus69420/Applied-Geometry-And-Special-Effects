@@ -104,7 +104,7 @@ void Scenario::cleanupScenario()
     scene()->remove(_blending20Curve.get());
   }
   else if (counter == 4) {
-    scene()->remove(_butterfly.get());
+    scene()->remove(_heart.get());
     scene()->remove(_gerbsCurve.get());
   }
 }
@@ -131,7 +131,7 @@ void Scenario::toggleSimulation()
     scene()->insert(_blending20Curve.get());
   }
   else if (counter == 4) {
-    scene()->insert(_butterfly.get());
+    scene()->insert(_heart.get());
     scene()->insert(_gerbsCurve.get());
   }
 }
@@ -224,15 +224,15 @@ void Scenario::initBlending()
 
 void Scenario::initGoebbels()
 {
-  _butterfly = std::make_shared<tardzone::ModelCurve<float>>(3);
-  _butterfly->toggleDefaultVisualizer();
-  _butterfly->setColor(GMlib::GMcolor::blueViolet());
-  _butterfly->setCollapsed(true);
-  _butterfly->sample(10000, 0);
+  _heart = std::make_shared<tardzone::ModelCurve<float>>(0.75);
+  _heart->toggleDefaultVisualizer();
+  _heart->setColor(GMlib::GMcolor::blueViolet());
+  _heart->setCollapsed(true);
+  _heart->sample(100, 0);
 
-  _gerbsCurve = std::make_shared<tardzone::GERBSCurve<float>>(_butterfly.get(), 100);
+  _gerbsCurve = std::make_shared<tardzone::GERBSCurve<float>>(_heart.get(), 10);
   _gerbsCurve->toggleDefaultVisualizer();
-  _gerbsCurve->sample(10000, 0);
+  _gerbsCurve->sample(100, 0);
 }
 
 void Scenario::callDefferedGL()

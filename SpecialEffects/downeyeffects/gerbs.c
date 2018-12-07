@@ -127,11 +127,22 @@ void GERBSCurve<T>::createSubCurves()
     _c[i] = std::make_shared<GMlib::PSubCurve<T>>(_modelCurve, _t[i], _t[i + 2], _t[i + 1]);
     this->insert(_c[i].get());
     _c[i]->toggleDefaultVisualizer();
-    _c[i]->setColor(GMlib::GMcolor::darkTurquoise());
     _c[i]->sample(100, 4);
     _c[i]->setVisible(true);
     _c[i]->setCollapsed(true);
   }
+
+  // Used to colour curves different colours to differentiate them
+  _c[0]->setColor(GMlib::GMcolor::aqua());
+  _c[1]->setColor(GMlib::GMcolor::black());
+  _c[2]->setColor(GMlib::GMcolor::brown());
+  _c[3]->setColor(GMlib::GMcolor::red());
+  _c[4]->setColor(GMlib::GMcolor::green());
+  _c[5]->setColor(GMlib::GMcolor::yellow());
+  _c[6]->setColor(GMlib::GMcolor::violet());
+  _c[7]->setColor(GMlib::GMcolor::lightPink());
+  _c[8]->setColor(GMlib::GMcolor::purple());
+  _c[9]->setColor(GMlib::GMcolor::white());
 }
 
 template <typename T>
@@ -193,7 +204,33 @@ void GERBSCurve<T>::localSimulate(double dt)
   _colour.toHSV();
   this->setColor(_colour);
 
+  // Calculate rotation and translation values based on dt
+  _beat += _up ? 0.005 * dt : -0.005 * dt;
+  float trans1 = _beat * 0.1f;
+  float trans3 = _beat * 0.3f;
+  float trans4 = _beat * 0.4f;
+  float trans05 = _beat * 0.1f;
+  float rot01 = _beat * 0.01f;
+
+  // Translate subcurves
+  _c[0]->translate({ 0.0f, 0.0f, _up ? -trans05 : trans05 });
+  _c[1]->translate({ _up ? trans1 : -trans1, 0.0f, 0.0f });
+  _c[2]->translate({ _up ? trans3 : -trans3, 0.0f, 0.0f });
+  _c[3]->translate({ _up ? trans4 : -trans4, 0.0f, 0.0f });
+  _c[4]->translate({ _up ? trans1 : -trans1, 0.0f, 0.0f });
+  _c[5]->translate({ 0.0f, 0.0f, _up ? -trans05 : trans05 });
+  _c[6]->translate({ _up ? -trans1 : trans1, 0.0f, 0.0f });
+  _c[7]->translate({ _up ? -trans4 : trans4, 0.0f, 0.0f });
+  _c[8]->translate({ _up ? -trans3 : trans3, 0.0f, 0.0f });
+  _c[9]->translate({ _up ? -trans1 : trans1, 0.0f, 0.0f });
+
+  // Rotate curves on top to smooth out the heart as it stretches out
+  _c[1]->rotateParent(_up ? -rot01 : rot01, _rot1);
+  _c[2]->rotateParent(_up ? -rot01 : rot01, _rot2);
+  _c[8]->rotateParent(_up ? rot01 : -rot01, _rot2);
+  _c[9]->rotateParent(_up ? rot01 : -rot01, _rot1);
+
   // Resample the curve
-  this->resample();
+  this->sample(100, 0);
 }
 } // namespace tardzone

@@ -1,8 +1,8 @@
 #ifndef TARDZONE_GERBS_H
 #define TARDZONE_GERBS_H
 
-#include <parametrics/gmpcurve.h>
 #include <memory>
+#include <parametrics/gmpcurve.h>
 #include <random>
 
 namespace tardzone {
@@ -50,13 +50,15 @@ class GERBSCurve : public GMlib::PCurve<T, 3> {
   std::vector<T> _t;
   int _n;
 
-
+  // Animation variables
   bool _up = true;
-  double _hue;
-  GMlib::Color _colour;
   std::mt19937 _gen;
+  double _hue, _beat;
+  GMlib::Color _colour;
   std::uniform_real_distribution<double> _dis;
   std::uniform_real_distribution<double> _step;
+  const GMlib::Vector<float, 3> _rot1 = { 1.2f, 1.0f, 0.0f };
+  const GMlib::Vector<float, 3> _rot2 = { -1.2f, 1.0f, 0.0f };
 };
 
 } // namespace tardzone

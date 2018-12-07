@@ -16,7 +16,7 @@
 % Margin defining package
 \usepackage{geometry}         
 \geometry{a4paper
-  ,margin=0.5in
+  ,margin=2cm
 }
 
 % Math related tools and functions
@@ -94,9 +94,6 @@
   tabsize=2                    % Set tabsize
 }
 
-% Referencing, last for compatibility reasons
-\usepackage[noabbrev]{cleveref}
-
 % Makes matrices look square-ish
 \renewcommand*{\arraystretch}{1.5}
 
@@ -112,7 +109,7 @@
 }
 \pagestyle{fancy}
 \fancyhf{}
-\chead{\footnotesize P.A.Sundsbø, Reporttemplate for submission of student project in the master courses SMN6200, UiT Narvik 2018}
+\chead{\footnotesize D.A. Salwerowicz, Report template for student projects in the master courses, UiT Narvik 2018}
 \rfoot{\footnotesize Page \thepage\ of \pageref{LastPage}}
 \setlength{\headheight}{20pt}
 \setlength{\footskip}{20pt}
@@ -123,16 +120,32 @@
 \titleformat*{\subsection}{\normalsize\itshape\bfseries}
 \titleformat*{\subsubsection}{\normalsize\bfseries}
 
+% Change look and feel of abstract
+\usepackage{abstract}
+\setlength{\absleftindent}{0mm}
+\setlength{\absrightindent}{0mm}
+\renewcommand*\abstractname{\flushleft\normalsize\textbf{Abstract}\hfill}
+
+% Change caption size and style
+\usepackage[font=footnotesize,labelsep=period]{caption}
+
+% Change date style
+\usepackage[yyyymmdd]{datetime}
+\renewcommand{\dateseparator}{-}
+
+% Referencing, last for compatibility reasons
+\usepackage[noabbrev]{cleveref}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%      Title, Author, and Date      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{Report template for submission of student project in the master course SMN6200}
-\author{P.A.Sundsbø}
+\title{Report template for student projects in the master courses}
+\author{D.A. Salwerowicz}
 \date{\parbox{\linewidth}{\centering
-    \today\endgraf\bigskip
-    \textit{\small UiT - The Arctic University of Norway, P.O. Box 385, N-8505 Narvik, Norway}
+    \textit{\small UiT - The Arctic University of Norway, P.O. Box 385, N-8505 Narvik, Norway}\endgraf\bigskip
+    \small Submitted \today
 }}
-\providecommand{\keywords}[1]{\textbf{\textit{\small{Keywords:}}} #1}
+\providecommand{\keywords}[1]{\flushleft\textit{\small{Keywords:}} #1}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%           Start document          %%
@@ -147,14 +160,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%      Abstract for the report      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\noindent\rule{\linewidth}{.5pt}
 \begin{abstract} 
-\noindent This document is a template for the report structure and text/content formatting for submission of the student project in the actual Master course. The reporting is based on an article structure similar to typical scientific journal requirements. The formatting must be identical to the one used in this description, i.e. Calibri, 11 pt size body text, 10 pt size figure text, justified alignment (body), single line spacing (body), top \& and bottom margins equal to 2.5 cm, left \& right equal to 2.0 cm etc. Beyond that, sizes and alignments must be according to the given document. Alternatively Latex fonts may be used. However, that applies to fonts only, layout and structure must be as described. The report must include the following parts; \textbf{Abstract, Introduction, Material \& Methods, Results \& Discussion, Conclusions, Acknowledgements, References and Appendices}.
+This document is a template for the report structure and text/content formatting for submission of the student project in the actual Master course. The reporting is based on an article structure similar to typical scientific journal requirements. The formatting must be identical to the one used in this description, i.e. Calibri, 11 pt size body text, 10 pt size figure text, justified alignment (body), single line spacing (body), top \& and bottom margins equal to 2.5 cm, left \& right equal to 2.0 cm etc. Beyond that, sizes and alignments must be according to the given document. Alternatively Latex fonts may be used. However, that applies to fonts only, layout and structure must be as described. The report must include the following parts; \textbf{Abstract, Introduction, Material \& Methods, Results \& Discussion, Conclusions, Acknowledgements, References and Appendices}.
 
 The students must submit one pdf copy by e-mail, to the subject teacher. Maximal size of document is 10 pages excluding appendices. Problem/project and deadline for submission will be given in the beginning of the course. Prior to submitting your report/work, please follow strictly and carefully check the instructions given in this manuscript. Please note that the signature and student exam number must be included with the printed author names and affiliations. The language should be English and Norwegian.
 
-\end{abstract}
-
 \keywords{\small{Report Structure}; \small{Article Structure Description}; \small{Text Formatting}}
+\end{abstract}
+\rule{\linewidth}{.5pt}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  The main content of the report  %%
@@ -183,19 +197,20 @@ Subsections are to be numbered 1.1, 1.2, 1.3 etc. The report/article is limited 
   \label{eq:FirstEquation}
 \end{equation}
 
-where u(10) is the air velocity at the height of 10m \citet{Tabler1990}.
+where u(10) is the air velocity at the height of 10m \citep{Tabler1990}.
 
 Figures and tables are also numbered continuously, with text sizes and appearances as shown in the examples below. 
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth]{SnowTransport.png}
-  \caption{Illustration of the drifting snow transport regions above a horizontal snow surface. The transport regions are illustrated by the typical snow particle movements/behaviour \citet{Sundsbo1997}}
+  \caption{Illustration of the drifting snow transport regions above a horizontal snow surface. The transport regions are illustrated by the typical snow particle movements/behaviour \citep{Sundsbo1997}.}
   \label{fig:SnowTransport}
 \end{figure}
 
 \begin{table}[H]
-  \begin{tabulary}{\textwidth}{|L|L|}
+  \footnotesize
+  \begin{tabulary}{\textwidth}{|l|L|}
     \hline
     Part in article structure & About function \& requirements \\\hline
     Abstract & Briefly states the purpose of the analysis/work principal results and eventually major conclusions. Should be enabled to be presented separately (fast track searches). \\ \hline
@@ -217,30 +232,26 @@ Ensure that each illustration has a caption that includes a brief title and desc
 \subsection{About References}
 Use the suggested citation style which includes Author family name(s) and year of publication, hence (Author family name(s), year of publication). The reference list must then be arranged correspondingly according to family names of the corresponding or first author and year. In this way the reader does not necessary have to look back in the reference list to check the origin of the actual information or theory. Any citation in the text must refer to a reference in the reference list and visa versa. Example:
 
-\begin{description}
-    \item[Citation in the text:] \citet{Sundsbo1998}
-    \item[Corresponding reference in Reference list:] \hfill \\ Sundsbø, P.-A. and Bang, B. (1998). International Snow Science Workshop, page 279–283.
-\end{description}
+\begin{table}[H]
+  \footnotesize
+  \begin{tabulary}{\textwidth}{lL}
+    Citation in the text: & \citep{Sundsbo1998}\\
+    Corresponding reference in Reference list: & Sundsbø, P.-A. and Bang, B. (1998). International Snow Science Workshop, page 279–283.
+  \end{tabulary}
+\end{table}
 
 For Web references, please use author/organization names, dates, reference to a source publication, etc., if available. This together with a full URL (Uniform Resource Locator). As a minimum, the full URL must be given. Web references can be included in the reference list or be listed separately after the reference list.
-
-\begin{description}
-  \item[Citation in the text:] \citet{FlowScienceInc2010}
-  \item[Corresponding reference in Reference list:] \hfill \\ Flow Science Inc (2010). Flow 3d. http://www.flow3d.com/apps/index.html. Accesed on 2010-10-21.
-\end{description}
-
-\begin{description}
-  \item[Citation in the text:] \citet{SINTEF2010}
-  \item[Corresponding reference in Reference list]: \hfill \\ SINTEF (2010). The centre for renewable energy. http://www.sintef.no/Home/Environment/fornybar-energi. Accesed on 2010-10-25.
-\end{description}
-
-\begin{description}
-  \item[Several citations from the same source:] \citet[a]{SINTEF2010}, using a, b, c etc.
-\end{description}
-
-\begin{description}
-  \item[Several references on one citation:] (\citet{SINTEF2010}; \citet{FlowScienceInc2010})
-\end{description}
+\begin{table}[H]
+  \footnotesize
+  \begin{tabulary}{\textwidth}{lL}
+    Citation in the text: & \citep{FlowScienceInc2010} \\
+    Corresponding reference in Reference list: & Flow Science Inc (2010). Flow 3d. http://www.flow3d.com/apps/index.html. Accesed on 2010-10-21. \\
+    Citation in the text: & \citep{SINTEF2010}\\
+    Corresponding reference in Reference list: & SINTEF (2010). The centre for renewable energy. http://www.sintef.no/Home/Environment/fornybar-energi. Accesed on 2010-10-25.\\
+    Several citations from the same source: & \citep[a]{SINTEF2010}, using a, b, c etc.\\
+    Several references on one citation: & (\citep{SINTEF2010}; \citep{FlowScienceInc2010})
+  \end{tabulary}
+\end{table}
 
 \subsection{About the Appendices}
 Appendices are to be located in the end of the document since this is considered as a supplementary part, however considered to be a necessity for the main target group of readers. If there is more than one appendix, they should be numbered as A, B, etc. Further numbering in the appendices must be related to the given appendix (\cref{eq:FirstEquation}, \cref{tab:ReportStructure}, \cref{fig:SnowTransport}, etc.). 

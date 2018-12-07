@@ -49,23 +49,22 @@ void ModelCurve<T>::eval(T t, int d, bool fromLeft) const
   // Set dimension for p
   this->_p.setDim(d + 1);
 
-  // Calculate value for a given t based on formula 4.3, page 70 in Blending technics[sic] for Curve and Surface constructions by Arne Lakså
-  const double cosT = std::cos(t);
-  const double sinT = std::sin(t);
-  const double sinT12 = std::sin(t / 12);
-  const double inner = std::exp(cosT) - (2 * std::cos(4 * t)) - std::pow(sinT12, 5.0);
+  // Based on parametric heart formula found here https://tpenguinltg.wordpress.com/2014/02/15/representing-the-heart-shape-precisely/
+  const double x = 16 * std::pow(std::sin(t), 3);
+  const double z = 13 * std::cos(t) - 5 * std::cos(2 * t) - 2 * std::cos(3 * t) - std::cos(4 * t);
 
-  // Set point's xyz position
-  this->_p[0]= {_size * T(inner * cosT), 0 ,_size * T(inner * sinT)};
+  this->_p[0] = { _size * T(x), 0, _size * T(z) };
 }
 
 template <typename T>
-T ModelCurve<T>::getStartP() const {
+T ModelCurve<T>::getStartP() const
+{
   return T(0);
 }
 
 template <typename T>
-T ModelCurve<T>::getEndP() const {
-  return T( M_PI * 24.0 );
+T ModelCurve<T>::getEndP() const
+{
+  return T(M_2PI);
 }
 } // namespace tardzone

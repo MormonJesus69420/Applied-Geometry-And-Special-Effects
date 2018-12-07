@@ -57,7 +57,7 @@ class Scenario : public GMlibWrapper {
   std::shared_ptr<tardzone::BlendingCurve<float>> _blending20Curve;
 
   std::shared_ptr<tardzone::GERBSCurve<float>> _gerbsCurve;
-  std::shared_ptr<tardzone::ModelCurve<float>> _butterfly;
+  std::shared_ptr<tardzone::ModelCurve<float>> _heart;
 
   int counter = 0, max = 4;
 };
