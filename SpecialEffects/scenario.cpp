@@ -110,8 +110,12 @@ void Scenario::cleanupScenario()
     scene()->remove(_gerbsCurve.get());
   }
   else if (counter == 5) {
+    scene()->remove(_cylinder.get());
+    scene()->remove(_plane.get());
     scene()->remove(_torus.get());
-    scene()->remove(_gerbsSurface.get());
+    scene()->remove(_cylinderSurface.get());
+    scene()->remove(_planeSurface.get());
+    scene()->remove(_torusSurface.get());
   }
 }
 
@@ -141,8 +145,12 @@ void Scenario::toggleSimulation()
     scene()->insert(_gerbsCurve.get());
   }
   else if (counter == 5) {
+    scene()->insert(_cylinder.get());
+    scene()->insert(_plane.get());
     scene()->insert(_torus.get());
-    scene()->insert(_gerbsSurface.get());
+    scene()->insert(_cylinderSurface.get());
+    scene()->insert(_planeSurface.get());
+    scene()->insert(_torusSurface.get());
   }
 }
 
@@ -174,7 +182,7 @@ void Scenario::initBSplineSampling()
 {
   _samplingCircle = std::make_shared<GMlib::PCircle<float>>(9);
   _samplingCircle->setColor(GMlib::GMcolor::cyan());
-  _samplingCircle->rotateGlobal(M_PI / 2.0, {1.0f, 0.0f, 0.0f});
+  _samplingCircle->rotateGlobal(M_PI / 2.0, { 1.0f, 0.0f, 0.0f });
   _samplingCircle->toggleDefaultVisualizer();
   _samplingCircle->sample(100, 0);
 
@@ -235,9 +243,10 @@ void Scenario::initBlending()
 
 void Scenario::initGoebbels()
 {
-  _heart = std::make_shared<tardzone::ModelCurve<float>>(0.70);
-  _heart->toggleDefaultVisualizer();
+  _heart = std::make_shared<tardzone::ModelCurve<float>>(0.75);
+  _heart->translateGlobal({ 0.0f, 0.0f, 1.5f });
   _heart->setColor(GMlib::GMcolor::cyan());
+  _heart->toggleDefaultVisualizer();
   _heart->setCollapsed(true);
   _heart->sample(100, 0);
 
@@ -248,16 +257,40 @@ void Scenario::initGoebbels()
 
 void Scenario::initSurface()
 {
-  _torus = std::make_shared<GMlib::PTorus<float>>(7.5f, 2.5f, 2.5f);
-  _torus->rotateGlobal(M_PI/2.0, {1.0f,0.0f,0.0f});
+  _cylinder = std::make_shared<GMlib::PCylinder<float>>(1.5f,1.5f,5.0f);
+  _cylinder->setMaterial(GMlib::GMmaterial::ruby());
+  _cylinder->toggleDefaultVisualizer();
+  _cylinder->replot(50, 50, 1, 1);
+
+  _plane = std::make_shared<GMlib::PPlane<float>>(
+      GMlib::Point<float, 3>(-15.0f, 0.0f, -5.0f),
+      GMlib::Vector<float, 3>(10.0f, 0.0f, 0.0f),
+      GMlib::Vector<float, 3>(0.0f, 0.0f, 10.0f));
+  _plane->setMaterial(GMlib::GMmaterial::ruby());
+  _plane->toggleDefaultVisualizer();
+  _plane->replot(50, 50, 1, 1);
+
+  _torus = std::make_shared<GMlib::PTorus<float>>(3.5f, 1.5f, 1.5f);
+  _torus->rotateGlobal(M_PI / 2.0, { 1.0f, 0.0f, 0.0f });
   _torus->setMaterial(GMlib::GMmaterial::ruby());
+  _torus->translateGlobal({10.0f, 0.0f, 0.0f});
   _torus->toggleDefaultVisualizer();
   _torus->replot(50, 50, 1, 1);
 
-//  _gerbsSurface = std::make_shared<tardzone::GERBSSurface<float>>(_torus.get(), 10, 10);
-//  _gerbsSurface->setMaterial(GMlib::GMmaterial::brass());
-//  _gerbsSurface->toggleDefaultVisualizer();
-//  _gerbsSurface->replot(50, 50, 1, 1);
+  _cylinderSurface = std::make_shared<tardzone::GERBSSurface<float>>(_cylinder.get(), 10, 10);
+  _cylinderSurface->setMaterial(GMlib::GMmaterial::brass());
+  _cylinderSurface->toggleDefaultVisualizer();
+  _cylinderSurface->replot(50, 50, 1, 1);
+
+  _planeSurface = std::make_shared<tardzone::GERBSSurface<float>>(_plane.get(), 10, 10);
+  _planeSurface->setMaterial(GMlib::GMmaterial::brass());
+  _planeSurface->toggleDefaultVisualizer();
+  _planeSurface->replot(50, 50, 1, 1);
+
+  _torusSurface = std::make_shared<tardzone::GERBSSurface<float>>(_torus.get(), 10, 10);
+  _torusSurface->setMaterial(GMlib::GMmaterial::brass());
+  _torusSurface->toggleDefaultVisualizer();
+  _torusSurface->replot(50, 50, 1, 1);
 }
 
 void Scenario::callDefferedGL()

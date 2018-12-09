@@ -154,7 +154,7 @@ int GERBSCurve<T>::iFinder(T t) const
     throw std::invalid_argument(err.toStdString());
   }
 
-  // Start searching at d and get value for n
+  // Start searching at d
   auto i = _d;
 
   // Increment i while t at i till i reach t (ends up being one interval over)

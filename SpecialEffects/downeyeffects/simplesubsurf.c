@@ -2,6 +2,7 @@
 
 namespace tardzone {
 template <typename T>
+inline
 SimpleSubSurface<T>::SimpleSubSurface(GMlib::PSurf<T, 3>* s, T su, T eu, T sv, T ev)
 {
   set(s, su, eu, (su + eu) / 2, sv, ev, (sv + ev) / 2);
@@ -14,6 +15,7 @@ SimpleSubSurface<T>::SimpleSubSurface(GMlib::PSurf<T, 3>* s, T su, T eu, T sv, T
 }
 
 template <typename T>
+inline
 SimpleSubSurface<T>::SimpleSubSurface(GMlib::PSurf<T, 3>* s, T su, T eu, T u, T sv, T ev, T v)
 {
   set(s, su, eu, u, sv, ev, v);
@@ -26,6 +28,7 @@ SimpleSubSurface<T>::SimpleSubSurface(GMlib::PSurf<T, 3>* s, T su, T eu, T u, T 
 }
 
 template <typename T>
+inline
 SimpleSubSurface<T>::SimpleSubSurface(const SimpleSubSurface<T>& replicant)
     : GMlib::PSurf<T, 3>(replicant)
 {

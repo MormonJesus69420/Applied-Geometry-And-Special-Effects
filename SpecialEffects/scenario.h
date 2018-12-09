@@ -27,6 +27,10 @@ class PBezierCurve;
 template <typename T>
 class PCircle;
 template <typename T>
+class PCylinder;
+template <typename T>
+class PPlane;
+template <typename T>
 class PTorus;
 }
 
@@ -67,8 +71,12 @@ class Scenario : public GMlibWrapper {
   std::shared_ptr<tardzone::GERBSCurve<float>> _gerbsCurve;
   std::shared_ptr<tardzone::ModelCurve<float>> _heart;
 
-  std::shared_ptr<tardzone::GERBSSurface<float>> _gerbsSurface;
+  std::shared_ptr<GMlib::PCylinder<float>> _cylinder;
+  std::shared_ptr<GMlib::PPlane<float>> _plane;
   std::shared_ptr<GMlib::PTorus<float>> _torus;
+  std::shared_ptr<tardzone::GERBSSurface<float>> _cylinderSurface;
+  std::shared_ptr<tardzone::GERBSSurface<float>> _planeSurface;
+  std::shared_ptr<tardzone::GERBSSurface<float>> _torusSurface;
 
   int counter = 0;
   const int max = 5;

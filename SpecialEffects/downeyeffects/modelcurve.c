@@ -39,7 +39,7 @@ T ModelCurve<T>::getSize() const
 template <typename T>
 bool ModelCurve<T>::isClosed() const
 {
-  // Butterfly curve is closed.
+  // Heart curve is closed.
   return true;
 }
 

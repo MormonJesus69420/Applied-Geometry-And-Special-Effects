@@ -31,7 +31,6 @@ class GERBSSurface : public GMlib::PSurf<T, 3> {
   // Protected virtual functions from PSurf
   void eval(T u, T v, int d1, int d2, bool lu = true, bool lv = true) const;
   void localSimulate(double dt) override;
-  void eval(T t, int d, bool fromLeft) const;
   T getStartPU() const override;
   T getStartPV() const override;
   T getEndPU() const override;
@@ -41,21 +40,24 @@ class GERBSSurface : public GMlib::PSurf<T, 3> {
 
   private:
   // Private functions for GERBSSurface
-  T wFunction(const int& d, const int& i, T t) const;
-  T blendingFunction(T t) const;
-  int iFinder(T t) const;
+  T wFunctionU(const int& d, const int& i, T t) const;
+  T wFunctionV(const int& d, const int& i, T t) const;
+  T blendingFunction(T t, bool derivate) const;
+  int iFinder(T t, bool useU) const;
   void createSubSurfaces();
-  void createKnots();
+  void createSubSurface(int u, int v);
+  void createKnotsU();
+  void createKnotsV();
 
   // Private virtual functions from PSurf
 
   // Private members for GERBSSurface
-  std::vector<std::shared_ptr<GMlib::PCurve<T, 3>>> _c;
+  GMlib::DMatrix<GMlib::PSurf<T, 3>*> _c;
   GMlib::PSurf<T, 3>* _modelSurface;
   const int _d = 1, _k = _d + 1;
-  int n1, n2;
-  std::vector<T> _tu;
-  std::vector<T> _tv;
+  int _n1, _n2;
+  std::vector<T> _tU;
+  std::vector<T> _tV;
 };
 
 } // namespace tardzone
