@@ -11,7 +11,7 @@ SimpleSubSurface<T>::SimpleSubSurface(GMlib::PSurf<T, 3>* s, T su, T eu, T sv, T
   _trans = tr[0][0];
   this->translateParent(_trans);
 
-  this->setMaterial(GMlib::GMmaterial::polishedGreen());
+  this->setMaterial(GMlib::GMmaterial::brass());
 }
 
 template <typename T>
@@ -24,7 +24,7 @@ SimpleSubSurface<T>::SimpleSubSurface(GMlib::PSurf<T, 3>* s, T su, T eu, T u, T 
   _trans = tr[0][0];
   this->translateParent(_trans);
 
-  this->setMaterial(GMlib::GMmaterial::polishedGreen());
+  this->setMaterial(GMlib::GMmaterial::brass());
 }
 
 template <typename T>

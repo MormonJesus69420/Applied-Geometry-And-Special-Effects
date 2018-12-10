@@ -277,18 +277,18 @@ void Scenario::initSurface()
   _torus->toggleDefaultVisualizer();
   _torus->replot(50, 50, 1, 1);
 
-  _cylinderSurface = std::make_shared<tardzone::GERBSSurface<float>>(_cylinder.get(), 10, 10);
-  _cylinderSurface->setMaterial(GMlib::GMmaterial::brass());
+  _cylinderSurface = std::make_shared<tardzone::GERBSSurface<float>>(_cylinder.get(), 16, 16);
+  _cylinderSurface->setMaterial(GMlib::GMmaterial::emerald());
   _cylinderSurface->toggleDefaultVisualizer();
   _cylinderSurface->replot(50, 50, 1, 1);
 
-  _planeSurface = std::make_shared<tardzone::GERBSSurface<float>>(_plane.get(), 10, 10);
-  _planeSurface->setMaterial(GMlib::GMmaterial::brass());
+  _planeSurface = std::make_shared<tardzone::GERBSSurface<float>>(_plane.get(), 16, 16);
+  _planeSurface->setMaterial(GMlib::GMmaterial::emerald());
   _planeSurface->toggleDefaultVisualizer();
   _planeSurface->replot(50, 50, 1, 1);
 
-  _torusSurface = std::make_shared<tardzone::GERBSSurface<float>>(_torus.get(), 10, 10);
-  _torusSurface->setMaterial(GMlib::GMmaterial::brass());
+  _torusSurface = std::make_shared<tardzone::GERBSSurface<float>>(_torus.get(), 16, 16);
+  _torusSurface->setMaterial(GMlib::GMmaterial::emerald());
   _torusSurface->toggleDefaultVisualizer();
   _torusSurface->replot(50, 50, 1, 1);
 }

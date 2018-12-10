@@ -22,7 +22,17 @@ GERBSSurface<T>::GERBSSurface(GMlib::PSurf<T, 3>* model, int n1, int n2)
 
   // Create subsurfaces
   createSubSurfaces();
-  _c[2][2]->translateParent({0.0f, -2.0f, 0.0f});
+
+    for(auto i = 0; i <= _n1; ++i) {
+      _c[i][4]->translateParent({0.0f, -1.0f, 0.0f});
+      _c[i][12]->translateParent({0.0f, 1.0f, 0.0f});
+    }
+
+    if (isClosedU()) {
+      _c[_n1][4]->translateParent({0.0f, 1.0f, 0.0f});
+      _c[_n1][12]->translateParent({0.0f, -1.0f, 0.0f});
+    }
+
 }
 
 template <typename T>
@@ -81,9 +91,21 @@ void GERBSSurface<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv) const
 template <typename T>
 void GERBSSurface<T>::localSimulate(double dt)
 {
-  if (_modelSurface->getEditDone()) {
-    this->replot(50, 50, 1, 1);
-  }
+//  if(++_counter % 100 == 0) {
+//    _up = !_up;
+//    _counter = 0;
+//  }
+
+//  for(auto i = 0; i < _n1; ++i) {
+//    _c[i][4]->translateParent({0.0f, _up ? -0.01f: 0.01f, 0.0f});
+//    _c[i][12]->translateParent({0.0f, _up ? 0.01f: -0.01f, 0.0f});
+//  }
+
+//  _c[8][4]->replot(50,50,1,1);
+//  _c[8][12]->replot(50,50,1,1);
+
+//  this->replot(50,50,1,1);
+
 }
 
 template <typename T>

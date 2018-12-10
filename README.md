@@ -21,7 +21,7 @@ Order of simulations are as follows:
  4. Animated GERBS curve based off of a heart curve, animated to look like it's beating.
  5. GERBS surfaces based off of a plane, cylinder and torus with one of the sub-planes translated out as to show that it truly works. 
 
-If you cannot run the application you can see the video of my project in action here: [https://youtu.be/6ehhbwDZfwg](Applied Geometry And Special Effects on YouTube)
+If you cannot run the application you can see the video of my project in action here: [https://youtu.be/j-YXZdhYR0E](Applied Geometry And Special Effects on YouTube)
 
 ## Authors
 **Daniel Aaron Salwerowicz** - *Developer and memer* - [CodeRefinery](https://source.coderefinery.org/MormonJesus69420)
