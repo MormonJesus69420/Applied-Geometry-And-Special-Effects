@@ -139,8 +139,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%      Title, Author, and Date      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{Report template for student projects in the master courses}
-\author{D.A. Salwerowicz}
+\title{From Simple B-Spline to GERBS Surface, or How I Stopped Sleeping and Learned to Hate My Life}
+\author{D. A. Salwerowicz}
 \date{\parbox{\linewidth}{\centering
     \textit{\small UiT - The Arctic University of Norway, P.O. Box 385, N-8505 Narvik, Norway}\endgraf\bigskip
     \small Submitted \today
@@ -162,11 +162,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \noindent\rule{\linewidth}{.5pt}
 \begin{abstract} 
-This document is a template for the report structure and text/content formatting for submission of the student project in the actual Master course. The reporting is based on an article structure similar to typical scientific journal requirements. The formatting must be identical to the one used in this description, i.e. Calibri, 11 pt size body text, 10 pt size figure text, justified alignment (body), single line spacing (body), top \& and bottom margins equal to 2.5 cm, left \& right equal to 2.0 cm etc. Beyond that, sizes and alignments must be according to the given document. Alternatively Latex fonts may be used. However, that applies to fonts only, layout and structure must be as described. The report must include the following parts; \textbf{Abstract, Introduction, Material \& Methods, Results \& Discussion, Conclusions, Acknowledgements, References and Appendices}.
+\verb|//TODO|
 
-The students must submit one pdf copy by e-mail, to the subject teacher. Maximal size of document is 10 pages excluding appendices. Problem/project and deadline for submission will be given in the beginning of the course. Prior to submitting your report/work, please follow strictly and carefully check the instructions given in this manuscript. Please note that the signature and student exam number must be included with the printed author names and affiliations. The language should be English and Norwegian.
-
-\keywords{\small{Report Structure}; \small{Article Structure Description}; \small{Text Formatting}}
+\keywords{Parametric Curves; B-Splines; Curve Blending; GERBS}
 \end{abstract}
 \rule{\linewidth}{.5pt}
 
@@ -175,17 +173,23 @@ The students must submit one pdf copy by e-mail, to the subject teacher. Maximal
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
-There are no universal report structures and formatting for writing e.q. academic papers, consultancy engineering reports or reports from analysis/laboratory activities. Academic journals have their individual structures and formatting, while company reporting may vary from close to research paper formats to only requiring a standard company front page. Using a fixed or defined structure like the one chosen for this course, might be very helpful for organizing and systematize your work and thoughts. Also, having a limited number of pages available automatically forces the writer(s) to concentrate on the most important material and information. The basic of the presented report structure in this article can be found in most of the published research articles, however the basic structure and methodology applies to reporting from consultancy engineering analysis/work as well.
+This project revolves around implementing various geometric objects using GMlib as a basis. Each of these object builds on previous therefore I will describe them seperately. Main focus of this project was to implement a GERBS curve and use affine transformations to create a dynamic animation.
 
-An appropriate structure in the reporting improves and organizes the dissemination of results and knowledge. Formatting (fonts, sizes, alignments etc.) has developed to promote readability and understanding. As official language settings helps to preserve common writing in general, formatting helps to maintain certain readability standards. Imagine a world without any formatting standards for books, articles, magazines etc.
+\subsection{B-Spline curve}
+Most basic object that I have implemented is a third degree, fourth order B-Spline curve using both a vector of \emph{control points} and \emph{sampling}.
 
-\subsection{About the abstract}
-The abstract is a brief summary of the article/report and should briefly state the purpose of the analysis/work principal results and eventually major conclusions. In journals, company or report series etc. an abstract may act as a stand-alone entity and made to be presented separately. References etc. should therefore be avoided. For this student project, the abstract should not exceed 150 words.
+\subsection{Blending curve}
+A more advances object implemented by me is a blending curve that takes in two curves and blends them into one curve using any percent of the original curves it wants. So I can use 50\% or 75\% of these curves and blend the rest.
 
-\subsection{About the introduction}
-The introduction should state the \ul{objectives} of the analysis/work and give the reader an adequate background. Why and where was the study undertaken? What was the purpose? Normally I state the extent, validity and/or limitations of the analysis/work, in the end of the introduction section. As an example, there might be uncertainties in the meteorological background data that forms the basis for a given local wind analysis. It is to be expected that the presented meteorological data is representative for the local wind conditions. The analysis will consequently not cover effects that occur with deviating wind conditions. Limitations connected to research method, the material available for the research or other such factors, may be located as a separate subdivision of the research discussion in the Material \& methods section.
+\subsection{GERBS curves and surfaces}
+Last and most complex objects implemented are a GERBS curve and surface, where GERBS stands for \emph{Generalized Expo-Rational B-Spline}. These objects are build out of local curves and surfaces that are blended together to form a curve/surface, instead of simple control points.
 
 \section{Material \& Methods}
+Here I will describe the most important tools and methods used during development of my project.
+
+
+
+
 \subsection{About the material \& methods part}
 The presentation of the material and methods used in the actual work/analysis should be sufficient to be evaluated or reproduced. Methods or parts of methods that have already been published should be indicated by a reference. Do not include unnecessary details about commonly known or standardized methods that can be referred to. Limit the description to additional or unique applications and relevant modifications. Unlike the Abstract and the Introduction, the Material and methods part may be differently named and may also be a section of several chapters. Examples of commonly used chapters for this part are: Theory Modelling, Experimental apparatus and procedure, Experimental setup etc.
 

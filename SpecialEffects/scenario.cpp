@@ -260,7 +260,7 @@ void Scenario::initSurface()
   _cylinder = std::make_shared<GMlib::PCylinder<float>>(1.5f,1.5f,5.0f);
   _cylinder->setMaterial(GMlib::GMmaterial::ruby());
   _cylinder->toggleDefaultVisualizer();
-  _cylinder->replot(50, 50, 1, 1);
+  _cylinder->replot(25, 25, 1, 1);
 
   _plane = std::make_shared<GMlib::PPlane<float>>(
       GMlib::Point<float, 3>(-15.0f, 0.0f, -5.0f),
@@ -268,29 +268,29 @@ void Scenario::initSurface()
       GMlib::Vector<float, 3>(0.0f, 0.0f, 10.0f));
   _plane->setMaterial(GMlib::GMmaterial::ruby());
   _plane->toggleDefaultVisualizer();
-  _plane->replot(50, 50, 1, 1);
+  _plane->replot(25, 25, 1, 1);
 
   _torus = std::make_shared<GMlib::PTorus<float>>(3.5f, 1.5f, 1.5f);
   _torus->rotateGlobal(M_PI / 2.0, { 1.0f, 0.0f, 0.0f });
   _torus->setMaterial(GMlib::GMmaterial::ruby());
   _torus->translateGlobal({10.0f, 0.0f, 0.0f});
   _torus->toggleDefaultVisualizer();
-  _torus->replot(50, 50, 1, 1);
+  _torus->replot(25, 25, 1, 1);
 
   _cylinderSurface = std::make_shared<tardzone::GERBSSurface<float>>(_cylinder.get(), 16, 16);
   _cylinderSurface->setMaterial(GMlib::GMmaterial::emerald());
   _cylinderSurface->toggleDefaultVisualizer();
-  _cylinderSurface->replot(50, 50, 1, 1);
+  _cylinderSurface->replot(25, 25, 1, 1);
 
   _planeSurface = std::make_shared<tardzone::GERBSSurface<float>>(_plane.get(), 16, 16);
   _planeSurface->setMaterial(GMlib::GMmaterial::emerald());
   _planeSurface->toggleDefaultVisualizer();
-  _planeSurface->replot(50, 50, 1, 1);
+  _planeSurface->replot(25, 25, 1, 1);
 
   _torusSurface = std::make_shared<tardzone::GERBSSurface<float>>(_torus.get(), 16, 16);
   _torusSurface->setMaterial(GMlib::GMmaterial::emerald());
   _torusSurface->toggleDefaultVisualizer();
-  _torusSurface->replot(50, 50, 1, 1);
+  _torusSurface->replot(25, 25, 1, 1);
 }
 
 void Scenario::callDefferedGL()

@@ -101,10 +101,7 @@ void GERBSSurface<T>::localSimulate(double dt)
 //    _c[i][12]->translateParent({0.0f, _up ? 0.01f: -0.01f, 0.0f});
 //  }
 
-//  _c[8][4]->replot(50,50,1,1);
-//  _c[8][12]->replot(50,50,1,1);
-
-//  this->replot(50,50,1,1);
+//  this->replot(25,25,1,1);
 
 }
 
@@ -228,7 +225,7 @@ void GERBSSurface<T>::createSubSurface(int u, int v)
 
   _c[u][v]->toggleDefaultVisualizer();
   _c[u][v]->setCollapsed(true);
-  _c[u][v]->replot(50, 50, 1, 1);
+  _c[u][v]->replot(10, 10, 1, 1);
   this->insert(_c[u][v]);
 }
 
@@ -268,6 +265,8 @@ void GERBSSurface<T>::createKnotsU()
     // Last knot needs to be equal to next to last knot minus distance between second and third knot from start
     _tU[_n1 + 2] = _tU[_n1 + 1] + _tU[2] - _tU[1];
   }
+
+  qDebug() << "Tu" << _tU;
 }
 
 template <typename T>
@@ -306,5 +305,6 @@ void GERBSSurface<T>::createKnotsV()
     // Last knot needs to be equal to next to last knot minus distance between second and third knot from start
     _tV[_n2 + 2] = _tV[_n2 + 1] + _tV[2] - _tV[1];
   }
+  qDebug() << "Tv" << _tV;
 }
 } // namespace tardzone
