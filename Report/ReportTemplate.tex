@@ -19,6 +19,9 @@
   ,margin=2cm
 }
 
+% Allows easy writing of algorithms
+\usepackage[ruled]{algorithm2e}
+
 % Math related tools and functions
 \usepackage{mathtools} 
 
@@ -109,7 +112,7 @@
 }
 \pagestyle{fancy}
 \fancyhf{}
-\chead{\footnotesize D.A. Salwerowicz, Report template for student projects in the master courses, UiT Narvik 2018}
+\chead{\footnotesize D.A. Salwerowicz, From B-Spline to GERBS Surface, curve manipulation and special effects}
 \rfoot{\footnotesize Page \thepage\ of \pageref{LastPage}}
 \setlength{\headheight}{20pt}
 \setlength{\footskip}{20pt}
@@ -185,165 +188,199 @@ A more advances object implemented by me is a blending curve that takes in two c
 Last and most complex objects implemented are a GERBS curve and surface, where GERBS stands for \emph{Generalized Expo-Rational B-Spline}. These objects are build out of local curves and surfaces that are blended together to form a curve/surface, instead of simple control points.
 
 \section{Material \& Methods}
-Here I will describe the most important tools and methods used during development of my project.
+Here I will describe the most important tools and methods used during development of my project. All of the theory in this section is based on book "Blending technics[sic] for Curve and Surface Constructions" written by Arne Laks\aa \,\citep{Laksa2012}.
 
+\subsection{GMlib}
+It's important to mention that I have based my project and work on the Geometric Modeling library also known as GMlib. It was developed at Arctic University of Norway, UiT Narvik. It handles a lot of necessary background calculation and rendering of objects on screen for me. This way I only needed to focus on implementing necessary functionality for calculating and showing B-Spline curves and other objects.
 
-
-
-\subsection{About the material \& methods part}
-The presentation of the material and methods used in the actual work/analysis should be sufficient to be evaluated or reproduced. Methods or parts of methods that have already been published should be indicated by a reference. Do not include unnecessary details about commonly known or standardized methods that can be referred to. Limit the description to additional or unique applications and relevant modifications. Unlike the Abstract and the Introduction, the Material and methods part may be differently named and may also be a section of several chapters. Examples of commonly used chapters for this part are: Theory Modelling, Experimental apparatus and procedure, Experimental setup etc.
-
-\subsection{About subdivision - numbered sections}
-Subsections are to be numbered 1.1, 1.2, 1.3 etc. The report/article is limited in size so there is no need for further numbered subdivision into 1.1.1 etc. This numbering should also be used in the internal crossreferencing. Equations are numbered continuously by integer number regardless of sub chapters, and arranged as shown in the example below. Transport of drifting snow by suspension is modelled so that suspension approaches asymptotically a saturated transport rate given by:
+\subsection{B-Spline Curves}
+\subsubsection{B-Spline from control points}
+One can create a B-Spline curve from a vector of \emph{control points} $\vec{c}$, which is then used to create a \emph{knot vector} $\vec{t}$. For any given B-Spline a knot vector will be of length $n+k$ where $n$ is length of control point vector and $k$ is the order. So in my case knot vector will have lenght 12 if I give it 8 control points. Resulting knot vector will look like one shown in \cref{eq:KnotVectorBSpline}.
 
 \begin{equation}
-  q_{suspension} = \frac{u(1)^{4.13}}{853119}
-  \label{eq:FirstEquation}
+\vec{t}= [0,0,0,0,1,2,3,4,5,5,5,5]
+\label{eq:KnotVectorBSpline}
 \end{equation}
 
-where u(10) is the air velocity at the height of 10m \citep{Tabler1990}.
+This B-Spline will be a \emph{Clamped B-Spline} as its first $k$ and last $k$ knots are equal to each other. Then I can use formula \cref{eq:BSplineFormula} to calculate my BSpline.
 
-Figures and tables are also numbered continuously, with text sizes and appearances as shown in the examples below. 
+\begin{equation}
+c(t)= \sum_{i=1}^{n} c_i b_{k,i}(t), \quad t \in \left[t_d,t_n\right]
+\label{eq:BSplineFormula}
+\end{equation}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.8\textwidth]{SnowTransport.png}
-  \caption{Illustration of the drifting snow transport regions above a horizontal snow surface. The transport regions are illustrated by the typical snow particle movements/behaviour \citep{Sundsbo1997}.}
-  \label{fig:SnowTransport}
-\end{figure}
+Here ${c_i}_{i=1}^n$ is a vector of controll point and $b_{k,i}(t)$ are basis functions that are defined by $t$ \citep[Chap 5.5.1]{Laksa2012}. \citep[Chap 5.5.3]{Laksa2012} describes in depth how we calculate these basis functions. Resulting basis functions are shown in \cref{eq:BasisFunctions}, there are four of them, since the order of my B-Spline is $4$.
 
-\begin{table}[H]
-  \footnotesize
-  \begin{tabulary}{\textwidth}{|l|L|}
-    \hline
-    Part in article structure & About function \& requirements \\\hline
-    Abstract & Briefly states the purpose of the analysis/work principal results and eventually major conclusions. Should be enabled to be presented separately (fast track searches). \\ \hline
-    1. Introduction & The introduction should state the objectives of the analysis/work and give the reader an adequate background. Possible include why and where was the study undertaken. \\ \hline
-    2. Material \& Methods & Represents important documentation related to the work. Description \& references should be sufficient to evaluate or reproduced the work/analysis. \\ \hline
-    3. Results \& Discussion  & This is normally the main section of the paper/report and results should be clear and concise. Limit the presentation of results to what is necessary for further discussion and conclusions. \\ \hline
-    4. Conclusions  & The results \& discussions forms the basis for the main conclusion(s) and any conclusion must be presented as clear and concise as possible. \\ \hline
-    Acknowledgements & As brief as possible. \\ \hline
-    References & Check proper formatting and citations versus reference list. \\ \hline
-    Appendices & Supplementary part, considered to be a necessity for the main target group of readers. \\\hline
-  \end{tabulary}
-  \caption{Basic structure for reporting in the actual course.}
-  \label{tab:ReportStructure}
-\end{table}
+\begin{equation}
+\begin{split}
+b_{k-3,i} &= \left[ \left( 1-w_{1,i}(t) \right) \left( 1-w_{2,i-1}(t) \right) \right] \left[ 1-w_{3,i-2}(t) \right]\\
+b_{k-2,i} &= \left[ \left( 1-w_{1,i}(t) \right) \left( 1-w_{2,i-1}(t) \right) \right] \left[ 1-w_{3,i-1}(t) \right]\\ &+ \left( \left[ \left( 1-w_{1,i}(t) \right) \left( w_{2,i-1}(t) \right) \right] + \left[ w_{1,i}(t) \left( 1-w_{2,i}(t) \right) \right] \right) \left[ 1-w_{3,i-t}(t) \right]\\
+b_{k-1,i} &= \left( \left[ \left( 1-w_{1,i}(t) \right) \left( w_{2,i-1}(t) \right) \right] + \left[ w_{1,i}(t) \left( 1-w_{2,i}(t) \right) \right] \right) \left[ w_{3,i-1}(t) \right]\\
+b_{k,i} &= w_{1,i}(t) w_{2,i}(t) w_{3,i}(t)
+\label{eq:BasisFunctions}
+\end{split}
+\end{equation}
 
-\subsection{Figure captions}
-Ensure that each illustration has a caption that includes a brief title and description of the actual illustration. Text can also be included in the illustrations, e.g. on a photo, graph etc. Text in the text is useful for explaining symbols and abbreviations used. The caption text should be kept to a minimum. However, as a thumb rule the figure with caption should be sufficient to understand the figure/illustration without reading the surrounding body text.
+$w_{d,i}(t)$ is a so called linear translation and scaling function used in B-Splines to translate the $t$ to a range $[0,1]$, and is defined in \cref{eq:WFunction}.
 
-\subsection{About References}
-Use the suggested citation style which includes Author family name(s) and year of publication, hence (Author family name(s), year of publication). The reference list must then be arranged correspondingly according to family names of the corresponding or first author and year. In this way the reader does not necessary have to look back in the reference list to check the origin of the actual information or theory. Any citation in the text must refer to a reference in the reference list and visa versa. Example:
+\begin{equation}
+  w_{d,i}(t) = 		
+  \begin{cases}
+    \frac{t-t_i}{t_{i+d} - t_i}, & \text{if } t_i \leq t \leq t_{i+d},\\
+    0, & \text{otherwise.}
+  \end{cases}
+  \label{eq:WFunction}
+\end{equation}
 
-\begin{table}[H]
-  \footnotesize
-  \begin{tabulary}{\textwidth}{lL}
-    Citation in the text: & \citep{Sundsbo1998}\\
-    Corresponding reference in Reference list: & Sundsbø, P.-A. and Bang, B. (1998). International Snow Science Workshop, page 279–283.
-  \end{tabulary}
-\end{table}
+Thus using these basis functions I am able to evaluate my B-Spline and draw it on screen which is shown in the first simulation in my program.
 
-For Web references, please use author/organization names, dates, reference to a source publication, etc., if available. This together with a full URL (Uniform Resource Locator). As a minimum, the full URL must be given. Web references can be included in the reference list or be listed separately after the reference list.
-\begin{table}[H]
-  \footnotesize
-  \begin{tabulary}{\textwidth}{lL}
-    Citation in the text: & \citep{FlowScienceInc2010} \\
-    Corresponding reference in Reference list: & Flow Science Inc (2010). Flow 3d. http://www.flow3d.com/apps/index.html. Accesed on 2010-10-21. \\
-    Citation in the text: & \citep{SINTEF2010}\\
-    Corresponding reference in Reference list: & SINTEF (2010). The centre for renewable energy. http://www.sintef.no/Home/Environment/fornybar-energi. Accesed on 2010-10-25.\\
-    Several citations from the same source: & \citep[a]{SINTEF2010}, using a, b, c etc.\\
-    Several references on one citation: & (\citep{SINTEF2010}; \citep{FlowScienceInc2010})
-  \end{tabulary}
-\end{table}
+\subsubsection{Sampled B-Spline}
+Another way of creating a B-Spline is by sampling points along an existing curve and then using least square method to create control points from a set of points, $p$. It is quite usefull as it lets us approximate any kind of freeform curve to a high degree of accuracy.
 
-\subsection{About the Appendices}
-Appendices are to be located in the end of the document since this is considered as a supplementary part, however considered to be a necessity for the main target group of readers. If there is more than one appendix, they should be numbered as A, B, etc. Further numbering in the appendices must be related to the given appendix (\cref{eq:FirstEquation}, \cref{tab:ReportStructure}, \cref{fig:SnowTransport}, etc.). 
+Knot vector is created the same way as before, I just use the provided $n$ to create it. However in order to calculate a vector of control points I have to perform matrix calculations. I first start by calculating an $A$ matrix. Values in it are defined by formula in \cref{eq:LeastSquare}.
 
-Source code may be located in the appendices or attached in digital format. Any programming parts that might be considered as real goodies may be located in the results section of the report. However, this depends highly on the nature of the project. In general, limit the attached data material to what is considered to be a necessity for the main target group for the particular work. Any attached digital video formats must be compatible with commonly used software.
+\begin{equation}
+\partial t = \frac{t_n - t_d}{m-1}
+\label{eq:LeastSquare}
+\end{equation}
 
-\subsection{Reporting from a reading course, review of an engineering topic or State of the Art}
-Engineers and researchers do regularly encounter problems or challenges that require an in depth study to gain more knowledge and understanding about a specific type of problem or solution methods. For a researcher this normally means reading articles describing the latest, related research results. Often this means investigating state of the art of the research area for a given topic. Writing of typical State of the art research articles normally requires a certain amount of international level research experience. An engineer must sometimes gather information to prepare for or to enable engineering solutions or analysis. This preparation may be for himself, for co-workers or to establish a decision background for costs/resources related to processes. 
+Where $m$ is the dimension of $p$. Algorithm used to calculate values in $A$ matrix is as shown in \cref{alg:CalculateA}.
 
-An engineering student must always keep in mind the very purpose of doing such an investigation. Main objectives must always be clear and that must be reflected in the reporting. Students often ask themselves (and others) what to write in the conclusions. “We have been collecting a lot of material on the actual topic and arranged the results in a logical structure…., so what?’ Well, this is normally a result of the commonly used cut-and-paste-from-literature / Web-without-thinking-method. \ul{Please pay special attention to possible conclusions already from the start of the actual work or analyses}. In typical method investigations or in dept studies it is especially important always to maintain the awareness regarding the main objectives for doing the work. A good advice is regularly to look for possible solutions or conclusions to your questions.
+\begin{algorithm}
+  \KwData{$m, n, d$}
+  \KwResult{$A$ matrix of basis functions used in calculating control points.}
+  Create an empty 2D matrix with $\text{dim}_1 = n$ and $\text{dim}_2 = m$\;
+  Calculate $\partial t$ using \eqref{eq:LeastSquare}\;
+  \For{$a_1 = 0;\ a_1 < m;\ ++a_1$}{			
+    Find $i$ using $t = t_d + a_1 \cdot \partial t$\;
+    Find $\vec{b}$ using \eqref{eq:BasisFunctions} with $k=t_d + a_1 \partial t$\;
+    \For{$a_2 = i-d;\ a_2 \leq i;\ ++a_2$}
+    {
+      $A_{a_1,a_2} = b_{a_2-i+d}$\;
+    }
+  }
+  \caption{Calculating values for matrix A}
+  \label{alg:CalculateA}
+\end{algorithm}
 
-\section{Results \& Discussion}
-This is normally the main section of the paper/report and results should be clear and concise. Limit the presentation of results to what is necessary for further discussion and conclusions. Remaining material may alternatively be presented in the Appendices. For consultancy analysis the results must be sufficient to fulfil the task requirements and providing a solution to the problem/mission.
+Using this algorithm we end up with a matrix that has non-zero values along its diagonal, and is zero elsewhere. Using this matrix and property: $$Ac = p$$ I can easily solve for $c$. However since $A$ is an asymetrical matrix I need to multiply it with itself transposed. So I multiply both side of the equation with $A^T$ and then substitute $A^TA=D$, lastly I multiply both sides of the equation with inverse of $D$ and get:
 
-\ul{The discussion should supplement the results} by explaining, evaluating and exploring the significance of the results of the work/analysis. \textbf{It is not necessary to repeat or recreate all what we clearly should have seen from the results (illustrations, pictures, tables, graphs etc.)}. Illustrations with belonging text info should be self-explanatory. The discussions may be included in the Results part however the discussion may also be presented separately after.
+\begin{equation}
+c=D^{-1}b
+\end{equation}
 
-\section{Conclusions}
-The results and discussions forms the basis for the main conclusion(s) and any conclusion must be presented as clear and concise as possible. The conclusions are normally presented in a separate short Conclusions section (as in this description). However, Conclusions may be a subsection of a Discussion or Results and Discussion section.
+After calculating this, I get a control point vector that I can then use to draw my B-Spline.
 
-The conclusions in an average student work/project are normally weak and often the weakest point of the report. \ul{Please pay special attention to possible conclusions already from the start of the actual work or analyses}. By always keeping an awareness regarding the main objectives for doing the work or making the analysis, the conclusions regarding whether you have achieved your goals or not, becomes clear.
+\subsubsection{Curve blending}
+Blended curve is simply a curve that is result of applying a \emph{B-Function} to two or more curves. B-function per definition is a \emph{permutation function}, where $B(0)=0$ and $B(1)=1$, it is as well \emph{monotone}, and can be symetric if it satisfies $B(t)+B(1-t)=1$. \citep[Chap 6.1]{Laksa2012}
 
-As a student and later working with engineering analysis, research etc., always keep in mind that structuring your reporting also will increase the efficiency of the work itself and thereby improving your results.
+There are several viable blending functions and ways of blending two curves. In my implementation I have chosen blending function shown in \cref{eq:BFunction} which is a polynomial function of first order. It is simple to calculate and derivate. My program gives possibility to choose how much of the original curve is used before the programs starts to blend the two together. \citep[Chap 6.2.2]{Laksa2012}
 
-Suggestions and recommendations for further work or analysis should be located in or immediately after the conclusions section. This since reflections about the further work naturally is the ‘final’ words from the author(s) to the reader and that these recommendations are normally founded on the conclusions. 
+\begin{equation}
+B(t)= 3t^2 - 2t^3
+\label{eq:BFunction}
+\end{equation}
 
-\section{Acknowledgements}
-The author would like to thank his colleagues at the postgraduate studies at UiT The arctic university of Norway in Narvik for reading and commenting on this document (Providing language help, writing assistance or proof reading the article, etc.).
+To evaluate a curve at blending point I use $c_3(t)$, defined by formula described in \cref{eq:BlendedCurve}. It uses $x$ as a blending point so that one can choose how much of original curves is used before blending occurs.
 
+\begin{equation}
+c_3(t)= c_1(t) + B\left( \frac{t-x}{1-x} \right) (c_2(t-x) - c_1(t)), \quad x \leq t < 1 \text{ and } x \in \left\langle 0,1 \right\rangle.
+\label{eq:BlendedCurve}
+\end{equation}
+
+Total curve is then defined by \cref{eq:TotalBlendedCurve}.
+
+\begin{equation}
+f(t) =
+\begin{cases}
+c_1(t), & \text{if }0 \leq t < x,\\
+c_3(t), & \text{if } x \leq t < 1,\\
+c_2(t-x) & \text{if }1 \leq t \leq 1 + x.
+\end{cases}
+\label{eq:TotalBlendedCurve}
+\end{equation}
+
+Which gives me a $C_1$ smooth curve in domain $[0,1+x]$.
+
+\subsubsection{GERBS Curve}
+\emph{General Expo-Rational B-Spline curve} or GERBS curve for short is a more advanced type of a B-Spline curve that instead of simple control points uses \emph{control curves} or \emph{local curves}. This gives one much more control over the resulting curves as one can not only change the position of control curve, but also its orientation by flipping, rotating or shrinking it. This control comes at a cost, as it is much more expensive and data demanding to evaluate these curves and they are much less numerically stable than simple B-Splines. Final curve is a result of blending these local curves into one, so one can easily see that they build up on two previous curve types. This blending and need for considering orientation of local curves is what makes it harder to work with GERBS.
+
+One also needs to take into consideration whether a curve is open or closed as the local curves span several knots and each point on the curve is defined by two curves. In case a curve is closed then I need to adjust the first and last knot vector by formulas described in \cref{eq:Knotting}, and the last subcurve is the same as the first one.
+
+\begin{align}
+\begin{split}
+t_0&=t_d-(t_{n+d}-t_n)\\
+t_{n+k}&=t_{n+d}+(t_k-t_d)
+\label{eq:Knotting}
+\end{split}
+\end{align}
+
+Besides that knot vector is made quite similar to the way that it is made for B-Splines, however it must start and end at values defined by model curve. In my case the model curve I chose starts at $0$ and ends at $2\pi$ and is known as one of the many heart curves, but it gives the nicest looking heart. It is defined by \cref{eq:HeartCurve} and I found this definition in \citep{Weisstein2018}.
+
+\begin{align}
+\begin{split}
+x &= 16 \sin^3(t) \\
+y &= 13 \cos(t) - 5 \cos(2t) - 2 \cos(3t) - \cos(4t), \quad t \in [0,2\pi]
+\label{eq:HeartCurve}
+\end{split}
+\end{align}
+
+After creating a knot vector it's relatively easy to create local curves based on $t$. In my case there are 10 subcurves and as such the knot vector contains 13 knots. In order to evaluate the curve I simply blend the two curves that define each point.
+
+After my curve is created I apply simple affine transformations to each local curve creating an animation that looks like a beating heart. Transformations used here are translation and rotation.
+
+\subsubsection{GERBS Surface}
+GERBS surfaces are similar to GERBS curves as they are also effect of blending of local surfaces, however now there are 4 surfaces defining each point on the surface and it requires two knot vectors to define it. It also requires that I check if the surface is closed in opposite direction of the knot vector so that I can adjust the knot vector the same way I did for the GERBS curve. 
+
+Instead of a vector of subcurves, a GERBS surface uses a matrix of subsurfaces. creating it is not easy as subsurfaces in last column and row must be created or copied from first column/row depending on whether or not the model surface is closed or not.
+
+In order to show that my code is working properly I have created three GERBS surfaces, one open, one closed in one direction, and one closed in both directions. They are as follows a plane, a cylinder and a torus.
+
+Evaluating GERBS surface is understandably hard, general formula for GERBS surfaces is defined in \cref{eq:GERBSFormula}
+
+\begin{equation}
+s(u,v)= \sum_{i=0}^{n_1-1} \left( \sum_{j=0}^{n_2-1} c_{i,j}(u,v) b_j(u) \right) b_i(v), \quad b_j(u) = B \circ w_{1,j}(u), b_i(v) = B \circ w_{1,i}(v).
+\label{eq:GERBSFormula}
+\end{equation}
+
+Which in turn can be turned into:
+
+\begin{equation}
+S(u,v)=
+\begin{pmatrix}
+1-b_j & b
+\end{pmatrix}
+\begin{pmatrix}
+c_{i-1,j-1} & c_{i,j-1}\\
+c_{i-1,j} & c_{i,j}
+\end{pmatrix}
+\begin{pmatrix}
+1-b_i \\
+b
+\end{pmatrix}
+\end{equation}
+
+Thus getting general formulation for position of each point on the surface:
+\begin{equation}
+  S(u,v)= (1-b_i) (1-b_j) c_{i-1,j-1} + (1-b_i) b_j c_{i-1,j} + b_i (1-b_j) c_{i,j-1} + b_i b_j c_{i,j}
+  \label{eq:GERBSGeneral}
+\end{equation}
+
+I also need to calculate derivatives of \cref{eq:GERBSGeneral}, $S_u$ $S_v$ and $S_{uv}$, and put them all in a matrix to define all the information needed for every point on the surface to get proper shading and lighting on the surface.
+
+\begin{equation}
+\begin{pmatrix}
+pos & S_v\\
+S_u & S_{uv}
+\end{pmatrix}
+\end{equation}
+
+This matrix is calculated and recorded for each point on the surface.
+ 
 \section{References}
 \begingroup
 \def\section*#1{}
 \bibliographystyle{apalike}
 \bibliography{References}
 \endgroup
-
-\pagebreak
-\appendix
-\section{Appendix A. Example on research paper and consultancy report structure}
-\begin{itemize}
-  \item An appropriate structure on your reporting will often improve the structure of the actual work/analysis and thereby improving the final results.
-  \item Most students/engineers develop a certain structure on a specific type work even if they think they do not.
-\end{itemize}
-
-The structure chosen for the reporting in this course consists of the following parts: Abstract, Introduction, Material \& Methods, Results \& Discussion, Conclusion, Acknowledgements, References and Appendices, reflects the basic within various types of scientific and engineering reporting. 
-
-\subsection{Example on a research paper structure for publication in an international engineering journal:}
-Beyers, J.H.M., Sundsbø, P.A. and Harms, T.M., 2004, Numerical simulation of three-dimensional, transient snow drifting around a cube, Journal of Wind Engineering and Industrial Aerodynamics, Volume 92, 725-747.
-
-\begin{itemize}
-  \item Abstract
-  \item Nomenclature
-  \item 1. Introduction
-  \item 2. Numerical modelling (Material and Methods)
-  \item 3. Experimental results (Results/Discussion)
-  \item 4. Numerical results and discussion (Results/Discussion)
-  \item 5. Conclusion
-  \item Acknowledgements
-  \item References
-\end{itemize}
-
-\subsection{Example on a consultancy report structure (large report, several issues):}
-Sundsbø, P.A., 2004, Wind Chill Index- and snowdrift simulations/analysis on Hammerfest LNG Plant, WSB report 105-03 Rev 1, Commissioned by Tractebel Industry Engineering, Brussels.
-
-\begin{itemize}
-  \item Summary (Abstract)
-  \item 1.0 Introduction
-  \item 2.0 The Wind Chill Index (WCI) (Material and Methods)
-  \item 3.0 Meteorological data – WCI (Material and Methods)
-  \item 4.0 Snow drift conditions (Material and Methods)
-  \item 5.0 Numerical model (Material and Methods)
-  \item 6.0 Numerical simulations of WCI (Results/Discussion)
-  \item 7.0 Numerical simulations of snowdrift (Results/Discussion)
-  \item 8.0 Snow drift control (Results/Discussion)
-  \item 9.0 Emergency escape ladder location (additional separate analysis)
-  \item 10.0 Conclusions
-  \item References
-  \item Appendices (I-III, showing results from WCI \& snowdrift analysis)
-\end{itemize}
-
-Comments: Material related to modelling, programming, simulations and data collections may be presented in the Appendices. Do not include unnecessary data/info. Evaluate this carefully.
-
-\pagebreak
-\appendix
-\section{Appendix B. Example on heading section for student project report}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{ProjectExample.png}
-\end{figure}
-
 \end{document} 

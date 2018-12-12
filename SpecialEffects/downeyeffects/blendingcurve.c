@@ -62,7 +62,7 @@ void BlendingCurve<T>::eval(T t, int d, bool fromLeft) const
   } // Blending point
   else if (_blendpoint <= t && t < T(1)) {
     // Credit to Kent Arne Larsen for finding formula for blend function letting us change blending point
-    this->_p[0] = posC1 + blendingFunction(t / (1 - _blendpoint) - _blendpoint / (1 - _blendpoint)) * (posC2 - posC1);
+    this->_p[0] = posC1 + blendingFunction((t - _blendpoint) / (1 - _blendpoint)) * (posC2 - posC1);
   } // Second curve, since t is beetween 1 and end point
   else if (T(1) <= t && t <= getEndP()) {
     this->_p[0] = posC2;

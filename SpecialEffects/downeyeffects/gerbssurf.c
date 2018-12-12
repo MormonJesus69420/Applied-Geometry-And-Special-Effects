@@ -23,16 +23,15 @@ GERBSSurface<T>::GERBSSurface(GMlib::PSurf<T, 3>* model, int n1, int n2)
   // Create subsurfaces
   createSubSurfaces();
 
-    for(auto i = 0; i <= _n1; ++i) {
-      _c[i][4]->translateParent({0.0f, -1.0f, 0.0f});
-      _c[i][12]->translateParent({0.0f, 1.0f, 0.0f});
-    }
+  for (auto i = 0; i <= _n1; ++i) {
+    _c[i][4]->translateParent({ 0.0f, -1.0f, 0.0f });
+    _c[i][12]->translateParent({ 0.0f, 1.0f, 0.0f });
+  }
 
-    if (isClosedU()) {
-      _c[_n1][4]->translateParent({0.0f, 1.0f, 0.0f});
-      _c[_n1][12]->translateParent({0.0f, -1.0f, 0.0f});
-    }
-
+  if (isClosedU()) {
+    _c[_n1][4]->translateParent({ 0.0f, 1.0f, 0.0f });
+    _c[_n1][12]->translateParent({ 0.0f, -1.0f, 0.0f });
+  }
 }
 
 template <typename T>
@@ -85,24 +84,23 @@ void GERBSSurface<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv) const
   auto P = (1 - bV) * b1 + bV * b2;
 
   // Set Position
-  this->_p[0][0] = P[0][0];
+  this->_p = P;
 }
 
 template <typename T>
 void GERBSSurface<T>::localSimulate(double dt)
 {
-//  if(++_counter % 100 == 0) {
-//    _up = !_up;
-//    _counter = 0;
-//  }
+  //  if(++_counter % 100 == 0) {
+  //    _up = !_up;
+  //    _counter = 0;
+  //  }
 
-//  for(auto i = 0; i < _n1; ++i) {
-//    _c[i][4]->translateParent({0.0f, _up ? -0.01f: 0.01f, 0.0f});
-//    _c[i][12]->translateParent({0.0f, _up ? 0.01f: -0.01f, 0.0f});
-//  }
+  //  for(auto i = 0; i < _n1; ++i) {
+  //    _c[i][4]->translateParent({0.0f, _up ? -0.01f: 0.01f, 0.0f});
+  //    _c[i][12]->translateParent({0.0f, _up ? 0.01f: -0.01f, 0.0f});
+  //  }
 
-//  this->replot(25,25,1,1);
-
+  //  this->replot(25,25,3,3);
 }
 
 template <typename T>
@@ -225,7 +223,7 @@ void GERBSSurface<T>::createSubSurface(int u, int v)
 
   _c[u][v]->toggleDefaultVisualizer();
   _c[u][v]->setCollapsed(true);
-  _c[u][v]->replot(10, 10, 1, 1);
+  _c[u][v]->replot(10, 10, 3, 3);
   this->insert(_c[u][v]);
 }
 
@@ -265,8 +263,6 @@ void GERBSSurface<T>::createKnotsU()
     // Last knot needs to be equal to next to last knot minus distance between second and third knot from start
     _tU[_n1 + 2] = _tU[_n1 + 1] + _tU[2] - _tU[1];
   }
-
-  qDebug() << "Tu" << _tU;
 }
 
 template <typename T>
@@ -298,13 +294,12 @@ void GERBSSurface<T>::createKnotsV()
     _tV[i] = ti;
   }
 
-  // If model curve is closed in U we need to adjust the start and end knots.
+  // If model surface is closed in U we need to adjust the start and end knots.
   if (isClosedU()) {
     // First knot needs to be equal to second knot minus distance between third and second knot from the end.
     _tV[0] = _tV[1] - (_tV[_n2 + 1] - _tV[_n2]);
     // Last knot needs to be equal to next to last knot minus distance between second and third knot from start
     _tV[_n2 + 2] = _tV[_n2 + 1] + _tV[2] - _tV[1];
   }
-  qDebug() << "Tv" << _tV;
 }
 } // namespace tardzone

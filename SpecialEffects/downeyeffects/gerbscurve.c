@@ -213,16 +213,15 @@ void GERBSCurve<T>::localSimulate(double dt)
   float trans1 = _beat * 0.1f;
   float trans3 = _beat * 0.3f;
   float trans4 = _beat * 0.4f;
-  float trans05 = _beat * 0.1f;
   float rot01 = _beat * 0.01f;
 
   // Translate subcurves
-  _c[0]->translate({ 0.0f, 0.0f, _up ? -trans05 : trans05 });
+  _c[0]->translate({ 0.0f, 0.0f, _up ? -trans1 : trans1 });
   _c[1]->translate({ _up ? trans1 : -trans1, 0.0f, 0.0f });
   _c[2]->translate({ _up ? trans3 : -trans3, 0.0f, 0.0f });
   _c[3]->translate({ _up ? trans4 : -trans4, 0.0f, 0.0f });
   _c[4]->translate({ _up ? trans1 : -trans1, 0.0f, 0.0f });
-  _c[5]->translate({ 0.0f, 0.0f, _up ? -trans05 : trans05 });
+  _c[5]->translate({ 0.0f, 0.0f, _up ? -trans1 : trans1 });
   _c[6]->translate({ _up ? -trans1 : trans1, 0.0f, 0.0f });
   _c[7]->translate({ _up ? -trans4 : trans4, 0.0f, 0.0f });
   _c[8]->translate({ _up ? -trans3 : trans3, 0.0f, 0.0f });
