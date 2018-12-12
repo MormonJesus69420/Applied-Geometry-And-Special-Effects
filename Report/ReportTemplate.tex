@@ -343,7 +343,7 @@ Instead of a vector of subcurves, a GERBS surface uses a matrix of subsurfaces. 
 
 In order to show that my code is working properly I have created three GERBS surfaces, one open, one closed in one direction, and one closed in both directions. They are as follows a plane, a cylinder and a torus.
 
-Evaluating GERBS surface is understandably hard, general formula for GERBS surfaces is defined in \cref{eq:GERBSSurfFormula}
+Evaluating GERBS surface is understandably hard, general formula for GERBS surfaces is defined in \cref{eq:GERBSSurfFormula}, that I got from Arne Laks\aa during lectures.
 
 \begin{equation}
 s(u,v)= \sum_{i=0}^{n_1-1} \left( \sum_{j=0}^{n_2-1} c_{i,j}(u,v) b_j(u) \right) b_i(v), \quad b_j(u) = B \circ w_{1,j}(u), b_i(v) = B \circ w_{1,i}(v).
@@ -399,7 +399,7 @@ Irregular tesselation does not keep any order or fashion of how the surface is d
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.5\textwidth]{Circumcircle.png}
-  \caption{Illustration of the the Delaunay triangulation with all the circumcircles shown \citep{NuEs:2016}.}
+  \caption{Illustration of the Delaunay triangulation with all the circumcircles shown \citep{NuEs:2016}.}
   \label{fig:Circumcircle}
 \end{figure}
 
@@ -428,6 +428,78 @@ My program uses it in the background for displaying my objects on the screen, an
   \caption{Delanuay triangulation algorithm}
   \label{alg:DelaunayTriangulation}
 \end{algorithm}
+ 
+\section{Results \& Discussion}
+Result of my project is overall very good, both when it comes to code quality and efficiency. In it I am able to create B-Splines, blend curves, and use them to create GERBS curves and surfaces. \Cref{fig:B-Splines,fig:Blending,fig:GERBSCurve,fig:GERBSSurface} show geometrical objects that my program is capable of rendering.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.49\textwidth]{B-Spline.png}
+  \includegraphics[width=0.49\textwidth]{Sampling.png}
+  \caption{Illustration of the B-Splines in my program, one created from control points (left), and one from sampling and least squares method (right).}
+  \label{fig:B-Splines}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Blending.png}
+  \caption{Illustration of the blending of two curves using 80\% of the original curves (magenta), 50\% (pink), and 20\% (red).}
+  \label{fig:Blending}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.49\textwidth]{GERBSCurve.png}
+  \includegraphics[width=0.49\textwidth]{LocalCurves.png}
+  \caption{Illustration of GERBS curve (left) and its subcurves (right).}
+  \label{fig:GERBSCurve}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{GERBSSurfaces.png}
+\caption{Illustration of GERBS surfaces, a plane, a cylinder, and a torus, with distorted subsurfaces.}
+\label{fig:GERBSSurface}
+\end{figure}
+
+As it stands my simple B-Splines are static, and are not animated in any way, although adding this functionality is trivial. I chose not to do it to make it easier to show that they are created correctly. As in they correspond to tested implementations of them in GMlib.
+
+Blending curves on the other hand are dynamic, so that changes in any of the two original curves is reflected in the blended curves. The functionality found there makes it easy for me to choose where blending occurs, instead of being limited to a static value of 20\% blending.
+
+GERBS curve, modeled after curve described by \cref{eq:HeartCurve} is fully dynamic and animated resulting in an animation of a beating heart. This effect is achieved by affine transformation on subcurves. During the animation loop curves 1-4 and 6-9 are translated along $x$-axis whereas curves 0 and 5 are translated along $y$-axis. In addition to that curves 1, 2, 8, and 9 are rotated along two vectors in $xy$-plane. These transformations result in dynamic and smooth animation where heart is stretched in and out.  \Cref{fig:CurveComparison} shows how these translated and rotated curves result in stretched out heart compared to original model curve. It also changes colour of the curve using HSV colour representation.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{CurveComparison.png}
+  \caption{Comparison between GERBS curve with transformed local curves (pink), and the model curve (cyan), defined by \cref{eq:HeartCurve}.}
+  \label{fig:CurveComparison}
+\end{figure}
+
+Affine transformations are a form of a linear mapping method which is used to translate, scale, shear, and rotate objects in affine space. Its properties is that it preserves \emph{collinearity}, \emph{parallelism}, \emph{convexity}, \emph{barycenters} of points, as well as \emph{ratios of length along a line}. The transformation itself occurs by multiplying objects matrix with the specifix matrix for a given transformation. One such matrix used for translating objects is shown in \cref{eq:TranslationMatrix}, where $x$, $y$, and $z$ specify displacement along respective axes. And \cref{fig:GERBSCurve} shows how these translated and rotated curves result in stretched out heart compared to original model curve.
+
+\begin{equation}
+\begin{bmatrix}
+1&0&0&0\\
+0&1&0&0\\
+0&0&1&0\\
+x&y&z&1
+\end{bmatrix}
+\label{eq:TranslationMatrix}
+\end{equation}
+
+Lastly my GERBS surfaces are also working correctly and are displayed properly. My code is capable of handling all three cases of closed and open surfaces and do affine transformations on local subsurfaces. However this is not dynamic as a bug in GMlib causes the replot function needed to update the surface causes my program to crash. Therefore I have only transformed the subsurfaces once before the main surface is drawn. However code needed for creating a dynamic animation is implemented, but not activated. If that bug is fixed then I need to only activate this code to get a dynamic animation.
+
+\section{Conclusions}
+The main focus of this project was to implement a GERBS curve and animate it, and I have done it quite well. There is nothing that I can complain about how this has been done.
+
+One of the possible further developments might be to extend the functionality of the GERBS curve to work in other dimensions as well as on higher orders.
+
+I am overall very satisfied with both the result of my project and what I have learned about computer graphics and geometry during this course. GERBS curves are not a really well explored subject and most of the papers regarding them talk about practical use of them, not so much about implementation of them from scratch. I personally think that in a few years time with better computing resources and understanding of them GERBS curves might replace B-Splines as the industry standard or at least become a tempting alternative to them.
+
+Lastly a video showing my program in action can be found here: \url{https://youtu.be/j-YXZdhYR0E}
+
+\section{Acknowledgements}
+I would like to thank Christopher Hagerup cha113, Victor Lindb\"{a}ck hli039, Olav Larseng ola014, Kent Larsen kla096, for cooperating on both this report and the project itself.
  
 \section{References}
 \begingroup

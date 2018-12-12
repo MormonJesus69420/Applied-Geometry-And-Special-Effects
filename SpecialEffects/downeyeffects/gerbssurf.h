@@ -60,7 +60,7 @@ class GERBSSurface : public GMlib::PSurf<T, 3> {
   std::vector<T> _tV;
 
   int _counter = 0;
-  bool _up = true;
+  bool _up = false;
 };
 
 } // namespace tardzone
