@@ -179,7 +179,7 @@
 This project revolves around implementing various geometric objects using GMlib as a basis. Each of these object builds on previous therefore I will describe them seperately. Main focus of this project was to implement a GERBS curve and use affine transformations to create a dynamic animation.
 
 \subsection{B-Spline curve}
-Most basic object that I have implemented is a third degree, fourth order B-Spline curve using both a vector of \emph{control points} and \emph{sampling}.
+Most basic object that I have implemented is a third degree, fourth order B-Spline curve using both a vector of \emph{control points} and \emph{least square approximation}.
 
 \subsection{Blending curve}
 A more advances object implemented by me is a blending curve that takes in two curves and blends them into one curve using any percent of the original curves it wants. So I can use 50\% or 75\% of these curves and blend the rest.
@@ -237,7 +237,7 @@ Thus using these basis functions I am able to evaluate my B-Spline and draw it o
 \subsubsection{Sampled B-Spline}
 Another way of creating a B-Spline is by sampling points along an existing curve and then using least square method to create control points from a set of points, $p$. It is quite usefull as it lets us approximate any kind of freeform curve to a high degree of accuracy.
 
-Knot vector is created the same way as before, I just use the provided $n$ to create it. However in order to calculate a vector of control points I have to perform matrix calculations. I first start by calculating an $A$ matrix. Values in it are defined by formula in \cref{eq:LeastSquare}.
+Knot vector is created the same way as before, I just use the provided $n$ to create it. However in order to calculate a vector of control points I have to perform matrix calculations. I first start by calculating an $A$ matrix. Values in it are defined by formula in \cref{eq:LeastSquare}, which gives me a least square approximation of the original curve.
 
 \begin{equation}
 \partial t = \frac{t_n - t_d}{m-1}
@@ -271,7 +271,7 @@ c=D^{-1}b
 
 After calculating this, I get a control point vector that I can then use to draw my B-Spline.
 
-\subsubsection{Curve blending}
+\subsection{Curve blending}
 Blended curve is simply a curve that is result of applying a \emph{B-Function} to two or more curves. B-function per definition is a \emph{permutation function}, where $B(0)=0$ and $B(1)=1$, it is as well \emph{monotone}, and can be symetric if it satisfies $B(t)+B(1-t)=1$. \citep[Chap 6.1]{Laksa2012}
 
 There are several viable blending functions and ways of blending two curves. In my implementation I have chosen blending function shown in \cref{eq:BFunction} which is a polynomial function of first order. It is simple to calculate and derivate. My program gives possibility to choose how much of the original curve is used before the programs starts to blend the two together. \citep[Chap 6.2.2]{Laksa2012}
@@ -302,8 +302,15 @@ c_2(t-x) & \text{if }1 \leq t \leq 1 + x.
 
 Which gives me a $C_1$ smooth curve in domain $[0,1+x]$.
 
-\subsubsection{GERBS Curve}
+\subsection{GERBS Curve}
 \emph{General Expo-Rational B-Spline curve} or GERBS curve for short is a more advanced type of a B-Spline curve that instead of simple control points uses \emph{control curves} or \emph{local curves}. This gives one much more control over the resulting curves as one can not only change the position of control curve, but also its orientation by flipping, rotating or shrinking it. This control comes at a cost, as it is much more expensive and data demanding to evaluate these curves and they are much less numerically stable than simple B-Splines. Final curve is a result of blending these local curves into one, so one can easily see that they build up on two previous curve types. This blending and need for considering orientation of local curves is what makes it harder to work with GERBS.
+
+Formula for them is defined in \cref{eq:GERBSCurveFormula}, where $c_i(t), \, i=1,..., n$ are local curves and $B_i(t), \, i=1,..., n$ are the ERBS basis functions
+
+\begin{equation}
+f(t)= \sum_{i=1}^{n} c_i(t) B_i(t)
+\label{eq:GERBSCurveFormula}
+\end{equation}
 
 One also needs to take into consideration whether a curve is open or closed as the local curves span several knots and each point on the curve is defined by two curves. In case a curve is closed then I need to adjust the first and last knot vector by formulas described in \cref{eq:Knotting}, and the last subcurve is the same as the first one.
 
@@ -325,22 +332,22 @@ y &= 13 \cos(t) - 5 \cos(2t) - 2 \cos(3t) - \cos(4t), \quad t \in [0,2\pi]
 \end{split}
 \end{align}
 
-After creating a knot vector it's relatively easy to create local curves based on $t$. In my case there are 10 subcurves and as such the knot vector contains 13 knots. In order to evaluate the curve I simply blend the two curves that define each point.
+After creating a knot vector it's relatively easy to create local curves based on $t$. I am using \emph{PSubCurve} for it, however a more common subcurve type are the \emph{Bezier curves}. In my case there are 10 subcurves and as such the knot vector contains 13 knots. In order to evaluate the curve I simply blend the two curves that define each point. Using those simple subcurves has made my work much easier and therefore let me focus more on the animation of final curve, than to spend time setting up the Bezier curves.
 
 After my curve is created I apply simple affine transformations to each local curve creating an animation that looks like a beating heart. Transformations used here are translation and rotation.
 
-\subsubsection{GERBS Surface}
+\subsection{GERBS Surface}
 GERBS surfaces are similar to GERBS curves as they are also effect of blending of local surfaces, however now there are 4 surfaces defining each point on the surface and it requires two knot vectors to define it. It also requires that I check if the surface is closed in opposite direction of the knot vector so that I can adjust the knot vector the same way I did for the GERBS curve. 
 
 Instead of a vector of subcurves, a GERBS surface uses a matrix of subsurfaces. creating it is not easy as subsurfaces in last column and row must be created or copied from first column/row depending on whether or not the model surface is closed or not.
 
 In order to show that my code is working properly I have created three GERBS surfaces, one open, one closed in one direction, and one closed in both directions. They are as follows a plane, a cylinder and a torus.
 
-Evaluating GERBS surface is understandably hard, general formula for GERBS surfaces is defined in \cref{eq:GERBSFormula}
+Evaluating GERBS surface is understandably hard, general formula for GERBS surfaces is defined in \cref{eq:GERBSSurfFormula}
 
 \begin{equation}
 s(u,v)= \sum_{i=0}^{n_1-1} \left( \sum_{j=0}^{n_2-1} c_{i,j}(u,v) b_j(u) \right) b_i(v), \quad b_j(u) = B \circ w_{1,j}(u), b_i(v) = B \circ w_{1,i}(v).
-\label{eq:GERBSFormula}
+\label{eq:GERBSSurfFormula}
 \end{equation}
 
 Which in turn can be turned into:
@@ -376,6 +383,51 @@ S_u & S_{uv}
 \end{equation}
 
 This matrix is calculated and recorded for each point on the surface.
+
+\subsection{Implementation}
+In order to implement the B-Spline curves I have based my class on \verb|PCurve| template class defined in GMlib. I used \verb|DVector| of \verb|Vector| objects for keeping track of control points, \verb|DVector| is a dynamic vector, and as name suggest can be dynamically expanded. A \verb|DMatrix| is used for the $A$ matrix used in calculating control points.
+
+I have also used \verb|PCurve| to represent blending curves, model curve and GERBS curve. Whereas \verb|PSurf| is used for the GERBS Surface. As I have mentioned earlier the I used \verb|PSubCurve| for local curves in my GERBS curve and I used \verb|SimpleSubSurface| for local surfaces in the GERBS surface.
+
+\subsection{Tesselation}
+One topic important to mention is the \emph{Tesselation}. Tesselation is used in rendering of curves and surfaces as a way of sampling and displaying approximated data. It is a piecewise linear approximation of freeform geometry. It means that it samples the curve and displays it on the screen as a set of straight lines and it displays surface as a set of triangles. Thanks to that computer avoids calculating position for every pixel on the surface and instead draws surface as a set of polygons that is much easier to compute.
+
+There are three main types of tesselation, \emph{regular}, \emph{irregular}, and \emph{quasi-regular}. An example of regular tesselation is a plane that is divided into a set of identical triangles ordered in regular rows and columns. \emph{Quad Trees} is an example of quasi-regular tessalation, this is a structure where each node in the tree has at most four children (exactly 4 in internal nodes). It's quasi regular as some parts of the surface can have more subdivision than others, but it's always done in a regular fashion.
+
+Irregular tesselation does not keep any order or fashion of how the surface is divided, however it still follows some rules. Most commonly used irregular tesselation is based on \emph{Delaunay triangulation}, as described by \citep[Chap 9.2]{Schwarzkopf1997} it is a triangulation for a set of points $P$ where no point in $P$ is inside the circumcircle of any triangle in the triangulation, this is clearly shown in \cref{fig:Circumcircle}. It is an optimal triangulation algorithm that maximizes the smallest angle for each triangle in it, as to avoid sliver triangles. It also corresponds to the dual graph of \emph{Voronoi diagram} described in \citep[Chap 7.1]{Schwarzkopf1997}. Resulting triangulation will have $2n-2-k$ triangles and $3n-3-k$ edges, where $k$ stands for number of points on the boundary.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{Circumcircle.png}
+  \caption{Illustration of the the Delaunay triangulation with all the circumcircles shown \citep{NuEs:2016}.}
+  \label{fig:Circumcircle}
+\end{figure}
+
+My program uses it in the background for displaying my objects on the screen, and \cref{alg:DelaunayTriangulation} describes how this triangulation is made. It is based on algorithm described in \citep[Chap 9.3]{Schwarzkopf1997}.
+
+\begin{algorithm}
+  \SetAlgoLined
+  \KwData{A set $P$ of $n$ points}
+  \KwResult{A Delaunay triangulation of $P$}
+  Find the convex hull for the $P$\;
+  Make 3 new points (the triangle)\;
+  Make 3 new edges and 1 triangle\;
+  \For{Each $p$ in $P$}{
+    Find triangle that $p$ is inside of\;
+    \uIf{$p$ is inside the triangle}{
+      Split the triangle into 3\;
+      Check and perform swap if necessary\;
+    }
+    \Else{
+      Split the edge that $p$ lies on in 2 and each triangle into 2\;
+      Check and perform swap if necessary\;
+    }
+  }
+  Remove the 3 new points\;
+  Remove the edges\;
+  \caption{Delanuay triangulation algorithm}
+  \label{alg:DelaunayTriangulation}
+\end{algorithm}
  
 \section{References}
 \begingroup
