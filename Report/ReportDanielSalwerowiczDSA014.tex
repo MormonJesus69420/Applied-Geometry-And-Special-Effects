@@ -263,7 +263,7 @@ Where $m$ is the dimension of $p$. Algorithm used to calculate values in $A$ mat
   \label{alg:CalculateA}
 \end{algorithm}
 
-Using this algorithm we end up with a matrix that has non-zero values along its diagonal, and is zero elsewhere. Using this matrix and property: $$Ac = p$$ I can easily solve for $c$. However $A$ is an asymetrical matrix, therefore I need to multiply it with $A^T$. So I multiply both sides of the equation with $A^T$ and then substitute $A^TA=D$, lastly I multiply both sides of the equation with $D^{-1}$ and get:
+Using this algorithm we end up with a matrix that has non-zero values along its diagonal, and is zero elsewhere. Using this matrix and property: $$Ac = p$$ I can easily solve for $c$. However since $A$ is an $m$x$n$ matrix, where $m$ is much larger than $n$, therefore I need to multiply it with $A^T$. So I multiply both sides of the equation with $A^T$ and then substitute $A^TA=D$, lastly I multiply both sides of the equation with $D^{-1}$ and get:
 
 \begin{equation}
 c=D^{-1}b
@@ -322,7 +322,7 @@ t_{n+k}&=t_{n+d}+(t_k-t_d)
 \end{split}
 \end{align}
 
-Besides that knot vector is made quite similar to the way it is made for B-Splines, however its start and end values are defined by model curve. The model curve I chose starts at $0$ and ends at $2\pi$ and is one of the many heart curves, but it gives the nicest looking heart. It is defined by \cref{eq:HeartCurve} \citep{Weisstein2018} and is a closed curve.
+Besides that knot vector is the same as one made for B-Splines,, however its start and end values are defined by model curve. The model curve I chose starts at $0$ and ends at $2\pi$ and is one of the many heart curves, but it gives the nicest looking heart. It is defined by \cref{eq:HeartCurve} \citep{Weisstein2018} and is a closed curve.
 
 \begin{align}
 \begin{split}
@@ -332,14 +332,16 @@ y &= 13 \cos(t) - 5 \cos(2t) - 2 \cos(3t) - \cos(4t), \quad t \in [0,2\pi]
 \end{split}
 \end{align}
 
-After creating a knot vector it's relatively easy to create local curves based on $t$. I am using a simple subcurve for it, however a more common subcurve type are \emph{Bezier curves}. I used 10 subcurves and as such the knot vector contains 13 knots. In order to evaluate the curve I simply blend the two curves that are defined for each point. Using these simple subcurves has made my work much easier and therefore let me focus more on the animation of final curve, than to spend time setting up the Bezier curves.
+After creating a knot vector it's relatively easy to create local curves based on $t$. I am using a simple subcurve for it, however a more common subcurve type are \emph{Bezier curves}. I used 10 subcurves and as such the knot vector contains 13 knots. In order to evaluate the curve I simply blend the local curves that define the global curve over the knot segment (the interval betwen two knots). Using these simple subcurves has made my work much easier and therefore let me focus more on the animation of final curve, than to spend time setting up the Bezier curves.
+
+Subcuvres are created based on the model curve $c$ and values from knot vector $s$, $e$, and $t$. Where $s$ is a start value for the subcurve, $e$ is the end value and $t$ is the value for local origin. As such I start from the beginning of my knot vector and set $s = \vec{c}_{i}$, $e = \vec{c}_{i+2}$ $t = \vec{c}_{i+1}$ where $i \in [0,1,2,...,n]$. If the curve is closed then the last local curve is set to be equal to the first one.
 
 After my curve is created I apply simple affine transformations to each local curve creating an animation that looks like a beating heart. Transformations used here are translation and rotation, they are described in depth in \cref{sec:Results}.
 
 \subsection{GERBS Surface}
 GERBS surfaces are similar to GERBS curves as they also result from blending, in this case of local surfaces. Now there are 4 surfaces defining each point on the surface, and two knot vectors are required to define it. It also demands that I check if the surface is closed in opposite direction of the knot vector so that I can adjust the knot vector the same way I did for the GERBS curve. 
 
-Instead of a vector of subcurves, a GERBS surface uses a matrix of subsurfaces. creating it is not easy, as local surfaces in last column and row must be created or copied from first column/row depending on whether or not the model surface is closed or not.
+Instead of a vector of subcurves, a GERBS surface uses a matrix of subsurfaces. creating it is not easy, as local surfaces in last column and row must be created or copied from first column/row depending on whether or not the model surface is closed or not. Besides that they are created in similar fashion to the local curves of GERBS curve, only now they use values from both knot vectors to define start, end, and local origin values.
 
 In order to show that my code is working properly I have created three GERBS surfaces, one open, one closed in one direction, and one closed in both directions. They are as follows a plane, a cylinder and a torus.
 
